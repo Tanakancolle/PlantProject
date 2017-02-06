@@ -4,10 +4,10 @@
 public class InterfaceParser : ParserBase {
     public override StructuralInfoBase[] Parse (string[] lines, ref int index,string namespace_name = "")
     {
-        var words = SplitSpace (lines [index]);
+        var words = PlantUMLUtility.SplitSpace (lines [index]);
 
         // インターフェースチェック
-        if (!CheckWord (words, "interface")) {
+        if (!PlantUMLUtility.CheckContainsWords (words, "interface")) {
             return null;
         }
         

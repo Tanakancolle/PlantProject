@@ -4,10 +4,10 @@
 public class ClassParser : ParserBase {
     public override StructuralInfoBase[] Parse (string[] lines, ref int index, string namespace_name = "")
     {
-        var words = SplitSpace (lines [index]);
+        var words = PlantUMLUtility.SplitSpace (lines [index]);
         
         // クラスチェック
-        if (!CheckWord (words, "class")) {
+        if (!PlantUMLUtility.CheckContainsWords (words, "class")) {
             return null;
         }
 
@@ -17,7 +17,7 @@ public class ClassParser : ParserBase {
         info.structuralName = lines [index].Replace ("class", string.Empty).Replace ("{", string.Empty).Replace ("abstract", string.Empty).Trim ();
 
         // 抽象クラスフラグ設定
-        info.isAbstract = CheckWord (SplitSpace (lines [index]), "abstract");
+        info.isAbstract = PlantUMLUtility.CheckContainsWords (PlantUMLUtility.SplitSpace (lines [index]), "abstract");
 
         // 内容までインデックスをずらす
         index++;
@@ -30,8 +30,8 @@ public class ClassParser : ParserBase {
         while (lines [index].IndexOf ("}") < 0) {
             var menber = new MenberInfo ();
 
-            menber.name = ReplaceAccessModifiers (lines [index]).TrimStart ();
-            menber.isAbstract = CheckWord (SplitSpace (lines [index]), "abstract");
+            menber.name = PlantUMLUtility.ReplaceAccessModifiers (lines [index]).TrimStart ();
+            menber.isAbstract = PlantUMLUtility.CheckContainsWords (PlantUMLUtility.SplitSpace (lines [index]), "abstract");
 
             info.menberList.Add (menber);
 

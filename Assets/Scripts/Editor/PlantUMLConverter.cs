@@ -8,25 +8,6 @@ using System.Text;
 
 public class PlantUMLConverter {
 
-    private const string createFolderPath = "Assets";
-
-    /// <summary>
-    /// 継承矢印パターン
-    /// </summary>
-    private const string arrowLeftPattern = @"(?:<\|{dir}-{1,})";
-
-    /// <summary>
-    /// 継承矢印パターン
-    /// </summary>
-    private const string arrowRightPattern = @"(?:-{1,}{dir}\|>)";
-
-    private const string arrowPattern = @"(?:<\|{dir}-{1,}|-{1,}{dir}\|>|<-{dir}-{1,}|-{1,}{dir}->)";
-
-    /// <summary>
-    /// 方向パターン
-    /// </summary>
-    private const string dirPattern = @"(?:|right|left|up|down|r|l|u|d)";
-
     /// <summary>
     /// 構造体情報リスト
     /// </summary>
@@ -65,8 +46,8 @@ public class PlantUMLConverter {
         ParseArrow (lines);
         
         // 継承矢印パターン
-        var left_regex = new Regex(arrowLeftPattern.Replace("{dir}", dirPattern));
-        var right_regex = new Regex(arrowRightPattern.Replace("{dir}", dirPattern));
+        var left_regex = new Regex(PlantUMLUtility.GetArrowExtensionLeftPattern());
+        var right_regex = new Regex (PlantUMLUtility.GetArrowExtensionRightPattern ());
 
         for (int i = 0; i < lines.Length; ++i) {
             if (left_regex.IsMatch (lines [i])) {
@@ -132,7 +113,7 @@ public class PlantUMLConverter {
     private void ParseArrow(string[] lines )
     {
         // 矢印パターン読み込み
-        Regex regex = new Regex (arrowPattern.Replace("{dir}",dirPattern));
+        Regex regex = new Regex (PlantUMLUtility.GetArrowPattern());
 
         foreach (var line in lines) {
             // 矢印チェック
