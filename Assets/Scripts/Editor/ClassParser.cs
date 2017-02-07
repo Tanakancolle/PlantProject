@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 
-
-public class ClassParser : ParserBase {
-    public override StructuralInfoBase[] Parse (string[] lines, ref int index, string namespace_name = "")
+/// <summary>
+/// クラスパーサー
+/// </summary>
+public class ClassParser : IContentParser {
+    public StructuralInfoBase[] Parse (string[] lines, ref int index, string namespace_name = "")
     {
         var words = PlantUMLUtility.SplitSpace (lines [index]);
         

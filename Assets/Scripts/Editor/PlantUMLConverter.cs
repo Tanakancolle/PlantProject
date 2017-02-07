@@ -16,7 +16,7 @@ public class PlantUMLConverter {
     /// <summary>
     /// パーサー配列
     /// </summary>
-    private ParserBase[] parsers = new ParserBase[] {
+    private IContentParser[] parsers = new IContentParser[] {
         new ClassParser(),
         new InterfaceParser()
     };
