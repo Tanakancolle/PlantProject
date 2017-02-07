@@ -24,7 +24,7 @@ public class PlantUMLConvertWindow : EditorWindow {
     private void OnGUI() {
         EditorGUILayout.BeginHorizontal ();
         EditorGUILayout.LabelField ("対象クラス図", GUILayout.MaxWidth (100));
-        textAsset = EditorGUILayout.ObjectField (textAsset, typeof(TextAsset)) as TextAsset;
+        textAsset = EditorGUILayout.ObjectField (textAsset, typeof(TextAsset), false) as TextAsset;
         EditorGUILayout.EndHorizontal ();
 
         EditorGUILayout.BeginHorizontal ();
