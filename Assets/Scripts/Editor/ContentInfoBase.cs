@@ -4,13 +4,13 @@ using UnityEngine;
 using System.Linq;
 
 /// <summary>
-/// 構造情報ベース
+/// コンテンツ情報ベース
 /// </summary>
-public abstract class StructuralInfoBase {
+public abstract class ContentInfoBase {
     /// <summary>
-    /// 構造名
+    /// コンテンツ名
     /// </summary>
-    public string structuralName;
+    public string contentName;
 
     /// <summary>
     /// ネームスペース名
@@ -25,26 +25,25 @@ public abstract class StructuralInfoBase {
     /// <summary>
     /// 継承リスト
     /// </summary>
-    public List<StructuralInfoBase> inheritanceList = new List<StructuralInfoBase>();
+    public List<ContentInfoBase> inheritanceList = new List<ContentInfoBase>();
 
     /// <summary>
-    /// 構造体名取得
+    /// コンテンツ名取得
     /// </summary>
-    /// <returns>The name.</returns>
     public virtual string GetName()
     {
-        return structuralName;
+        return contentName;
     }
 
     /// <summary>
-    /// 宣言する構造体名取得
+    /// 宣言するコンテンツ名取得
     /// </summary>
     public abstract string GetDeclarationName ();
 
     /// <summary>
-    /// 継承メンバー名取得
+    /// 抽象メンバー名取得
     /// </summary>
-    public virtual string[] GetInheritanceMemberNames()
+    public virtual string[] GetAbstractMemberNames()
     {
         if (menberList == null) {
             return null;
@@ -53,7 +52,10 @@ public abstract class StructuralInfoBase {
         return menberList.Where (member => member.isAbstract).Select (menber => menber.name).ToArray ();
     }
 
-    public virtual void AddInhritanceInfo(StructuralInfoBase info)
+    /// <summary>
+    /// 継承情報追加
+    /// </summary>
+    public virtual void AddInhritanceInfo(ContentInfoBase info)
     {
         inheritanceList.Add(info);
     }

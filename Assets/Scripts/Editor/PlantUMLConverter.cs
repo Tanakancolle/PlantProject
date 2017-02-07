@@ -9,9 +9,9 @@ using System.Text;
 public class PlantUMLConverter {
 
     /// <summary>
-    /// 構造体情報リスト
+    /// コンテンツ情報リスト
     /// </summary>
-    private List<StructuralInfoBase> structuralInfoList = new List<StructuralInfoBase>();
+    private List<ContentInfoBase> structuralInfoList = new List<ContentInfoBase>();
 
     /// <summary>
     /// パーサー配列
@@ -30,7 +30,7 @@ public class PlantUMLConverter {
         // １行毎に分割
         var lines = text.Replace ("\r\n", "\n").Split ('\n');
 
-        // 構造パース処理
+        // コンテンツパース処理
         for (int i = 0; i < lines.Length; ++i) {
             foreach (var parser in parsers) {
                 var infos = parser.Parse (lines, ref i);
@@ -78,7 +78,7 @@ public class PlantUMLConverter {
             StringBuilder builder = new StringBuilder ();
             string tab = string.Empty;
 
-            // 構造定義開始
+            // コンテンツ定義開始
             builder.AppendLine (tab + info.GetDeclarationName ());
             builder.AppendLine (tab + "{");
             {
@@ -131,11 +131,11 @@ public class PlantUMLConverter {
                     continue;
                 }
 
-                // 新構造名はクラスとする
+                // 新コンテンツはクラスとする
                 var info = new ClassInfo ();
-                info.structuralName = replace_name;
+                info.contentName = replace_name;
 
-                // クラス名登録
+                // クラス登録
                 structuralInfoList.Add (info);
             }
         }

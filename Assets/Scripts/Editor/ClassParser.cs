@@ -4,7 +4,7 @@
 /// クラスパーサー
 /// </summary>
 public class ClassParser : IContentParser {
-    public StructuralInfoBase[] Parse (string[] lines, ref int index, string namespace_name = "")
+    public ContentInfoBase[] Parse (string[] lines, ref int index, string namespace_name = "")
     {
         var words = PlantUMLUtility.SplitSpace (lines [index]);
         
@@ -16,7 +16,7 @@ public class ClassParser : IContentParser {
         var info = new ClassInfo ();
 
         // クラス名設定
-        info.structuralName = lines [index].Replace ("class", string.Empty).Replace ("{", string.Empty).Replace ("abstract", string.Empty).Trim ();
+        info.contentName = lines [index].Replace ("class", string.Empty).Replace ("{", string.Empty).Replace ("abstract", string.Empty).Trim ();
 
         // 抽象クラスフラグ設定
         info.isAbstract = PlantUMLUtility.CheckContainsWords (PlantUMLUtility.SplitSpace (lines [index]), "abstract");
@@ -42,6 +42,6 @@ public class ClassParser : IContentParser {
 
         index++;
 
-        return new StructuralInfoBase[] { info };
+        return new ContentInfoBase[] { info };
     }
 }

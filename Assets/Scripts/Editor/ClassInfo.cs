@@ -4,7 +4,7 @@ using System.Text;
 /// <summary>
 /// クラス情報
 /// </summary>
-public class ClassInfo : StructuralInfoBase {
+public class ClassInfo : ContentInfoBase {
 
     /// <summary>
     /// 抽象クラスフラグ
@@ -17,9 +17,9 @@ public class ClassInfo : StructuralInfoBase {
 
         // 抽象クラスチェック
         if (isAbstract) {
-            declaration = string.Format("public abstract class {0}", structuralName);
+            declaration = string.Format("public abstract class {0}", contentName);
         } else {
-            declaration = string.Format("public class {0}", structuralName);
+            declaration = string.Format("public class {0}", contentName);
         }
 
         // 継承チェック
@@ -27,6 +27,7 @@ public class ClassInfo : StructuralInfoBase {
         {
             StringBuilder builder = new StringBuilder();
 
+            // 継承を再現
             foreach (var inheritance in inheritanceList.Select(x => x.GetName()))
             {
                 if (builder.Length > 0)

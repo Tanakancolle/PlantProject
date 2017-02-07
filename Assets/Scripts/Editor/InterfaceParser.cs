@@ -4,7 +4,7 @@
 /// インターフェースパーサー
 /// </summary>
 public class InterfaceParser : IContentParser {
-    public StructuralInfoBase[] Parse (string[] lines, ref int index,string namespace_name = "")
+    public ContentInfoBase[] Parse (string[] lines, ref int index,string namespace_name = "")
     {
         var words = PlantUMLUtility.SplitSpace (lines [index]);
 
@@ -16,7 +16,7 @@ public class InterfaceParser : IContentParser {
         var info = new InterfaceInfo ();
 
         // インターフェース名設定
-        info.structuralName = lines [index].Replace ("interface", string.Empty).Replace ("{", string.Empty).Trim ();
+        info.contentName = lines [index].Replace ("interface", string.Empty).Replace ("{", string.Empty).Trim ();
 
         // 内容までインデックスをずらす
         index++;
@@ -39,6 +39,6 @@ public class InterfaceParser : IContentParser {
 
         index++;
 
-        return new StructuralInfoBase[] { info };
+        return new ContentInfoBase[] { info };
     }
 }
