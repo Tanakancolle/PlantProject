@@ -286,11 +286,13 @@ public class StringBuilderSupporter
     }
 
     /// <summary>
-    /// スクリプト作成
+    /// Creates the script.
     /// </summary>
-    /// <param name="path">作成パス</param>
-    /// <param name="builder_text">スクリプトの内容</param>
-    public static void CreateScript( string path, string builder_text )
+    /// <returns><c>true</c>, スクリプト生成, <c>false</c> スクリプト未生成.</returns>
+    /// <param name="path">生成パス</param>
+    /// <param name="builder_text">スクリプト内容テキスト</param>
+    /// <param name="is_overwride"><c>true</c> ファイルが存在した場合、上書き</param>
+    public static bool CreateScript( string path, string builder_text, bool is_overwride )
     {
         // ディレクトリ作成
         var directoryName = Path.GetDirectoryName(path);
@@ -299,9 +301,15 @@ public class StringBuilderSupporter
             Directory.CreateDirectory(directoryName);
         }
 
+        // ファイル存在チェック
+        if (!is_overwride && File.Exists (path)) {
+            return false;
+        }
+
         // スクリプト作成
         File.WriteAllText(path, builder_text, Encoding.UTF8);
 
+        return true;
     }
 
     /// <summary>

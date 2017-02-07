@@ -102,7 +102,8 @@ public class PlantUMLConverter {
             }
             builder.AppendLine ("}");
 
-            StringBuilderSupporter.CreateScript (string.Format ("{0}/{1}.cs", create_folder.TrimEnd('/') , info.GetName ()), builder.ToString ());
+            // スクリプト生成　※上書きは行わない
+            StringBuilderSupporter.CreateScript (string.Format ("{0}/{1}.cs", create_folder.TrimEnd ('/'), info.GetName ()), builder.ToString (), false);
             StringBuilderSupporter.RefreshEditor ();
         }
     }
