@@ -13,8 +13,7 @@ public class StringBuilderSupporter
     /// <summary>
     /// 無効文字配列
     /// </summary>
-    private static readonly string[] kINVALID_CHARS =
-    {
+    private static readonly string[] kINVALID_CHARS = {
         " ", "!", "\"", "#", "$", "%", "&", "\'", "(", ")", 
         "-", "=", "^", "~", "\\", "|", "[", "{",  "@", "`", 
         "]", "}", ":", "*", ";", "+", "/", "?", ".", ">", 
@@ -24,10 +23,14 @@ public class StringBuilderSupporter
     /// <summary>
     /// 列挙型最初無効文字配列
     /// </summary>
-    private static readonly string[] kENUM_FIRST_INVALID_CHARS =
-    {
+    private static readonly string[] kENUM_FIRST_INVALID_CHARS = {
         "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
     };
+
+    /// <summary>
+    /// タブのスペーズ数
+    /// </summary>
+    private const int kTAB_TO_SPACE_NUM = 4;
 
     /// <summary>
     /// 名前空間定義 ※「}」あり
@@ -104,7 +107,7 @@ public class StringBuilderSupporter
     /// <param name="is_static">静的クラスか</param> 
     /// <returns>クラスが定義された文字列</returns>
     public static string EditClass( string class_name, int tab_num = 0, bool is_static = false, string summary = "" )
-    {                                              
+    {
         // ビルダー生成
         StringBuilder builder = new StringBuilder();
 
@@ -282,7 +285,7 @@ public class StringBuilderSupporter
     /// <returns>タブが設定された文字列</returns>
     public static string SetTab( int num )
     {
-        return new string ('\t', num);
+        return new string (' ', num * kTAB_TO_SPACE_NUM);
     }
 
     /// <summary>
