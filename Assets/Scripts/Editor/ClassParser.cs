@@ -3,7 +3,8 @@
 /// <summary>
 /// クラスパーサー
 /// </summary>
-public class ClassParser : IContentParser {
+public class ClassParser : IContentParser
+{
     public ContentInfoBase[] Parse (string[] lines, ref int index, string namespace_name = "")
     {
         var words = PlantUMLUtility.SplitSpace (lines [index]);
@@ -16,7 +17,7 @@ public class ClassParser : IContentParser {
         var info = new ClassInfo ();
 
         // クラス名設定
-        info.contentName = lines [index].Replace ("class", string.Empty).Replace ("{", string.Empty).Replace ("abstract", string.Empty).Trim ();
+        info.SetName (lines [index].Replace ("class", string.Empty).Replace ("{", string.Empty).Replace ("abstract", string.Empty).Trim ());
 
         // 抽象クラスフラグ設定
         info.isAbstract = PlantUMLUtility.CheckContainsWords (PlantUMLUtility.SplitSpace (lines [index]), "abstract");
@@ -28,14 +29,13 @@ public class ClassParser : IContentParser {
         }
 
         // 定義終了まで内容をパース
-        info.memberList = new List<MemberInfo> ();
         while (lines [index].IndexOf ("}") < 0) {
             var member = new MemberInfo ();
 
             member.name = PlantUMLUtility.ReplaceAccessModifiers (lines [index]).TrimStart ();
             member.isAbstract = PlantUMLUtility.CheckContainsWords (PlantUMLUtility.SplitSpace (lines [index]), "abstract");
 
-            info.memberList.Add (member);
+            info.AddMemberInfo (member);
 
             index++;
         }

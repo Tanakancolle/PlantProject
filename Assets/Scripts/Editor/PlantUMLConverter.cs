@@ -9,33 +9,42 @@ using System.Text;
 /// <summary>
 /// PlantUMLコンバーター
 /// </summary>
-public class PlantUMLConverter {
+public class PlantUMLConverter
+{
 
     /// <summary>
     /// コンテンツ情報リスト
     /// </summary>
-    private List<ContentInfoBase> contentInfoList = new List<ContentInfoBase>();
+    private List<ContentInfoBase> contentInfoList = new List<ContentInfoBase> ();
 
     /// <summary>
     /// パーサー配列
     /// </summary>
     private IContentParser[] parsers = new IContentParser[] {
-        new ClassParser(),
-        new InterfaceParser()
+        new ClassParser (),
+        new InterfaceParser ()
     };
 
     /// <summary>
     /// 変換処理
     /// </summary>
-    public void ConvertProcess(string text, string create_folder)
+    public void ConvertProcess (string text, string create_folder)
     {
         // １行毎に分割
         var lines = text.Replace ("\r\n", "\n").Split ('\n');
 
-        // コンテンツパース処理
+        string namespace_name = string.Empty;
+
         for (int i = 0; i < lines.Length; ++i) {
+            // ネームスペースパース処理
+            namespace_name = ParseNamespace (lines, ref i);
+            if (!string.IsNullOrEmpty (namespace_name)) {
+                continue;
+            }
+
+            // コンテンツパース処理
             foreach (var parser in parsers) {
-                var infos = parser.Parse (lines, ref i);
+                var infos = parser.Parse (lines, ref i, namespace_name);
                 if (infos == null) {
                     continue;
                 }
@@ -48,19 +57,34 @@ public class PlantUMLConverter {
         ParseArrow (lines);
 
         // 継承パース処理
-        ParseExtension(lines);
+        ParseExtension (lines);
 
         // スクリプト生成処理
-        CreateScripts(create_folder);
+        CreateScripts (create_folder);
+    }
+
+    /// <summary>
+    /// ネームスペースパース
+    /// </summary>
+    private string ParseNamespace (string[] lines, ref int index)
+    {
+        var words = PlantUMLUtility.SplitSpace (lines [index].TrimStart ());
+
+        // ネームスペースチェック
+        if (!words [0].Contains ("namespace")) {
+            return string.Empty;
+        }
+
+        return words [1];
     }
 
     /// <summary>
     /// 矢印パース
     /// </summary>
-    private void ParseArrow(string[] lines )
+    private void ParseArrow (string[] lines)
     {
         // 矢印パターン読み込み
-        Regex regex = new Regex (PlantUMLUtility.GetArrowPattern());
+        Regex regex = new Regex (PlantUMLUtility.GetArrowPattern ());
 
         foreach (var line in lines) {
             // 矢印チェック
@@ -74,13 +98,13 @@ public class PlantUMLConverter {
                 var replace_name = struct_name.Trim ();
 
                 // すでに登録されているか
-                if (contentInfoList.Any (x => x.GetName() == replace_name)) {
+                if (contentInfoList.Any (x => x.GetName () == replace_name)) {
                     continue;
                 }
 
                 // 新コンテンツはクラスとする
                 var info = new ClassInfo ();
-                info.contentName = replace_name;
+                info.SetName (replace_name);
 
                 // クラス登録
                 contentInfoList.Add (info);
@@ -91,9 +115,10 @@ public class PlantUMLConverter {
     /// <summary>
     /// 継承パース
     /// </summary>
-    private void ParseExtension(string[] lines) {
+    private void ParseExtension (string[] lines)
+    {
         // 継承矢印パターン
-        var left_regex = new Regex(PlantUMLUtility.GetArrowExtensionLeftPattern());
+        var left_regex = new Regex (PlantUMLUtility.GetArrowExtensionLeftPattern ());
         var right_regex = new Regex (PlantUMLUtility.GetArrowExtensionRightPattern ());
 
         // 矢印チェック
@@ -121,13 +146,14 @@ public class PlantUMLConverter {
     /// <summary>
     /// スクリプト群生成
     /// </summary>
-    private void CreateScripts(string create_folder) {
+    private void CreateScripts (string create_folder)
+    {
         var create_path = create_folder.TrimEnd ('/');
         var method_regex = new Regex (@"\(*\)");
 
         string tab = string.Empty;
 
-        foreach( var info in contentInfoList ) {
+        foreach (var info in contentInfoList) {
             StringBuilder builder = new StringBuilder ();
 
             tab = string.Empty;
