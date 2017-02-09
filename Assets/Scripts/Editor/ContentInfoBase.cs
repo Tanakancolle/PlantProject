@@ -20,7 +20,7 @@ public abstract class ContentInfoBase {
     /// <summary>
     /// メンバーリスト
     /// </summary>
-    public List<MenberInfo> menberList = new List<MenberInfo>();
+    public List<MemberInfo> memberList = new List<MemberInfo>();
 
     /// <summary>
     /// 継承リスト
@@ -41,15 +41,29 @@ public abstract class ContentInfoBase {
     public abstract string GetDeclarationName ();
 
     /// <summary>
+    /// 宣言するメンバ名取得
+    /// </summary>
+    public virtual List<MemberInfo> GetDeclarationMemberInfos() {
+        var list = new List<MemberInfo> ();
+        foreach (var info in inheritanceList) {
+            list.AddRange (info.GetAbstractMemberInfos ());
+        }
+
+        list.AddRange (memberList);
+
+        return list;
+    }
+
+    /// <summary>
     /// 抽象メンバー名取得
     /// </summary>
-    public virtual string[] GetAbstractMemberNames()
+    public virtual MemberInfo[] GetAbstractMemberInfos()
     {
-        if (menberList == null) {
+        if (memberList == null) {
             return null;
         }
 
-        return menberList.Where (member => member.isAbstract).Select (menber => menber.name).ToArray ();
+        return memberList.Where (member => member.isAbstract).ToArray ();
     }
 
     /// <summary>
@@ -64,7 +78,7 @@ public abstract class ContentInfoBase {
 /// <summary>
 /// メンバー情報
 /// </summary>
-public class MenberInfo {
+public class MemberInfo {
     public string name;
     public bool isAbstract;
 }

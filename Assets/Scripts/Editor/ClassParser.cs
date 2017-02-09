@@ -28,14 +28,14 @@ public class ClassParser : IContentParser {
         }
 
         // 定義終了まで内容をパース
-        info.menberList = new List<MenberInfo> ();
+        info.memberList = new List<MemberInfo> ();
         while (lines [index].IndexOf ("}") < 0) {
-            var menber = new MenberInfo ();
+            var member = new MemberInfo ();
 
-            menber.name = PlantUMLUtility.ReplaceAccessModifiers (lines [index]).TrimStart ();
-            menber.isAbstract = PlantUMLUtility.CheckContainsWords (PlantUMLUtility.SplitSpace (lines [index]), "abstract");
+            member.name = PlantUMLUtility.ReplaceAccessModifiers (lines [index]).TrimStart ();
+            member.isAbstract = PlantUMLUtility.CheckContainsWords (PlantUMLUtility.SplitSpace (lines [index]), "abstract");
 
-            info.menberList.Add (menber);
+            info.memberList.Add (member);
 
             index++;
         }

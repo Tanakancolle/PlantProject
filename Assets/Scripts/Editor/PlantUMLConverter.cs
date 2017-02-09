@@ -6,12 +6,15 @@ using System.Text.RegularExpressions;
 using UnityEditor;
 using System.Text;
 
+/// <summary>
+/// PlantUMLコンバーター
+/// </summary>
 public class PlantUMLConverter {
 
     /// <summary>
     /// コンテンツ情報リスト
     /// </summary>
-    private List<ContentInfoBase> structuralInfoList = new List<ContentInfoBase>();
+    private List<ContentInfoBase> contentInfoList = new List<ContentInfoBase>();
 
     /// <summary>
     /// パーサー配列
@@ -24,7 +27,6 @@ public class PlantUMLConverter {
     /// <summary>
     /// 変換処理
     /// </summary>
-    /// <param name="text">Text.</param>
     public void ConvertProcess(string text, string create_folder)
     {
         // １行毎に分割
@@ -38,74 +40,18 @@ public class PlantUMLConverter {
                     continue;
                 }
 
-                structuralInfoList.AddRange (infos);
+                contentInfoList.AddRange (infos);
             }
         }
 
-        // 矢印パース
+        // 矢印パース処理
         ParseArrow (lines);
-        
-        // 継承矢印パターン
-        var left_regex = new Regex(PlantUMLUtility.GetArrowExtensionLeftPattern());
-        var right_regex = new Regex (PlantUMLUtility.GetArrowExtensionRightPattern ());
 
-        for (int i = 0; i < lines.Length; ++i) {
-            if (left_regex.IsMatch (lines [i])) {
-                var structurals = left_regex.Split (lines [i]).Select (x => x.Trim ()).ToArray ();
+        // 継承パース処理
+        ParseExtension(lines);
 
-                var base_structural = structuralInfoList.FirstOrDefault (x => x.GetName () == structurals [0]);
-
-                var target_structural = structuralInfoList.FirstOrDefault (x => x.GetName () == structurals [1]);
-
-                target_structural.AddInhritanceInfo (base_structural);
-            } else if (right_regex.IsMatch (lines [i])) {
-                var structurals = right_regex.Split (lines [i]).Select (x => x.Trim ()).ToArray ();
-
-                if (structurals.Length < 2) {
-                    Debug.LogError (structurals);
-                }
-
-                var base_structural = structuralInfoList.FirstOrDefault (x => x.GetName () == structurals [1]);
-
-                var target_structural = structuralInfoList.FirstOrDefault (x => x.GetName () == structurals [0]);
-
-                target_structural.AddInhritanceInfo (base_structural);
-            }
-        }
-
-        var method_regex = new Regex (@"\(*\)");
-        foreach( var info in structuralInfoList ) {
-            StringBuilder builder = new StringBuilder ();
-            string tab = string.Empty;
-
-            // コンテンツ定義開始
-            builder.AppendLine (tab + info.GetDeclarationName ());
-            builder.AppendLine (tab + "{");
-            {
-                tab = StringBuilderSupporter.SetTab (1);
-                foreach (var member in info.menberList) {
-                    // メンバ宣言
-                    builder.Append (tab + member.name);
-
-                    // 関数処理
-                    if (method_regex.IsMatch (member.name)) {
-                        builder.AppendLine (" {}");
-                    } else if (member.name.IndexOf (";") < 0) {
-                        builder.AppendLine (";");
-                    } else {
-                        builder.AppendLine ();
-                    }
-
-                    // 改行
-                    builder.AppendLine ();
-                }
-            }
-            builder.AppendLine ("}");
-
-            // スクリプト生成　※上書きは行わない
-            StringBuilderSupporter.CreateScript (string.Format ("{0}/{1}.cs", create_folder.TrimEnd ('/'), info.GetName ()), builder.ToString (), false);
-            StringBuilderSupporter.RefreshEditor ();
-        }
+        // スクリプト生成処理
+        CreateScripts(create_folder);
     }
 
     /// <summary>
@@ -128,7 +74,7 @@ public class PlantUMLConverter {
                 var replace_name = struct_name.Trim ();
 
                 // すでに登録されているか
-                if (structuralInfoList.Any (x => x.GetName() == replace_name)) {
+                if (contentInfoList.Any (x => x.GetName() == replace_name)) {
                     continue;
                 }
 
@@ -137,8 +83,100 @@ public class PlantUMLConverter {
                 info.contentName = replace_name;
 
                 // クラス登録
-                structuralInfoList.Add (info);
+                contentInfoList.Add (info);
             }
         }
+    }
+
+    /// <summary>
+    /// 継承パース
+    /// </summary>
+    private void ParseExtension(string[] lines) {
+        // 継承矢印パターン
+        var left_regex = new Regex(PlantUMLUtility.GetArrowExtensionLeftPattern());
+        var right_regex = new Regex (PlantUMLUtility.GetArrowExtensionRightPattern ());
+
+        // 矢印チェック
+        for (int i = 0; i < lines.Length; ++i) {
+            if (left_regex.IsMatch (lines [i])) {
+                var contents = left_regex.Split (lines [i]).Select (x => x.Trim ()).ToArray ();
+
+                var base_content = contentInfoList.FirstOrDefault (x => x.GetName () == contents [0]);
+                var target_content = contentInfoList.FirstOrDefault (x => x.GetName () == contents [1]);
+
+                // 継承情報追加
+                target_content.AddInhritanceInfo (base_content);
+            } else if (right_regex.IsMatch (lines [i])) {
+                var contents = right_regex.Split (lines [i]).Select (x => x.Trim ()).ToArray ();
+
+                var base_content = contentInfoList.FirstOrDefault (x => x.GetName () == contents [1]);
+                var target_content = contentInfoList.FirstOrDefault (x => x.GetName () == contents [0]);
+
+                // 継承情報追加
+                target_content.AddInhritanceInfo (base_content);
+            }
+        }
+    }
+
+    /// <summary>
+    /// スクリプト群生成
+    /// </summary>
+    private void CreateScripts(string create_folder) {
+        var create_path = create_folder.TrimEnd ('/');
+        var method_regex = new Regex (@"\(*\)");
+
+        string tab = string.Empty;
+
+        foreach( var info in contentInfoList ) {
+            StringBuilder builder = new StringBuilder ();
+
+            tab = string.Empty;
+
+            // コンテンツ定義開始
+            builder.AppendLine (tab + info.GetDeclarationName ());
+            builder.AppendLine (tab + "{");
+            {
+                tab = StringBuilderSupporter.SetTab (1);
+                
+                // 変数と関数を分ける
+                // TODO : 変数と関数は元から分けるように変更（定義パターンを作成）
+                var variable_list = new List<MemberInfo> ();
+                var method_list = new List<MemberInfo> ();
+
+                foreach (var member in info.GetDeclarationMemberInfos ()) {
+                    if (method_regex.IsMatch (member.name)) {
+                        method_list.Add (member);
+                    } else {
+                        variable_list.Add (member);
+                    }
+                }
+
+                // 変数宣言
+                foreach (var variable in variable_list) {
+                    // メンバ宣言
+                    builder.AppendLine (tab + variable.name + (variable.name.IndexOf (";") < 0 ? ";" : string.Empty));
+
+                    // 改行
+                    builder.AppendLine ();
+                }
+
+                // 関数宣言
+                foreach (var method in  method_list) {
+                    // メンバ宣言
+                    builder.AppendLine (tab + method.name + " {}");
+
+                    // 改行
+                    builder.AppendLine ();
+                }
+            }
+            builder.AppendLine ("}");
+
+            // スクリプト生成　※上書きは行わない
+            if (!StringBuilderSupporter.CreateScript (string.Format ("{0}/{1}.cs", create_path, info.GetName ()), builder.ToString (), false)) {
+                Debug.LogWarningFormat ("既に存在するため生成されませんでした：{0}.cs", info.GetName ());
+            }
+        }
+
+        StringBuilderSupporter.RefreshEditor ();
     }
 }

@@ -25,14 +25,14 @@ public class InterfaceParser : IContentParser {
         }
 
         // 定義終了まで内容をパース
-        info.menberList = new List<MenberInfo> ();
+        info.memberList = new List<MemberInfo> ();
         while (lines [index].IndexOf ("}") < 0) {
-            var menber = new MenberInfo ();
+            var member = new MemberInfo ();
 
-            menber.name = string.Format ("public {0}", lines [index].TrimStart ());
-            menber.isAbstract = true;
+            member.name = string.Format ("public {0}", lines [index].TrimStart ());
+            member.isAbstract = true;
 
-            info.menberList.Add (menber);
+            info.memberList.Add (member);
 
             index++;
         }
