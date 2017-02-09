@@ -50,9 +50,19 @@ public abstract class ContentInfoBase
     public abstract string GetDeclarationName ();
 
     /// <summary>
+    /// 宣言するメンバ数名取得
+    /// </summary>
+    public abstract string[] GetDeclarationValueNames ();
+
+    /// <summary>
+    /// 宣言する関数名取得
+    /// </summary>
+    public abstract string[] GetDeclarationMethodNames ();
+
+    /// <summary>
     /// 宣言するメンバ名取得
     /// </summary>
-    public virtual List<MemberInfo> GetDeclarationMemberInfos ()
+    protected virtual List<MemberInfo> GetDeclarationMemberInfos ()
     {
         var list = new List<MemberInfo> ();
         foreach (var info in inheritanceList) {
@@ -76,6 +86,9 @@ public abstract class ContentInfoBase
         return memberList.Where (member => member.isAbstract).ToArray ();
     }
 
+    /// <summary>
+    /// メンバ情報追加
+    /// </summary>
     public virtual void AddMemberInfo (MemberInfo info)
     {
         memberList.Add (info);

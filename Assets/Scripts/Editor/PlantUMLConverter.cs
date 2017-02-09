@@ -149,7 +149,6 @@ public class PlantUMLConverter
     private void CreateScripts (string create_folder)
     {
         var create_path = create_folder.TrimEnd ('/');
-        var method_regex = new Regex (@"\(*\)");
 
         string tab = string.Empty;
 
@@ -163,33 +162,20 @@ public class PlantUMLConverter
             builder.AppendLine (tab + "{");
             {
                 tab = StringBuilderSupporter.SetTab (1);
-                
-                // 変数と関数を分ける
-                // TODO : 変数と関数は元から分けるように変更（定義パターンを作成）
-                var variable_list = new List<MemberInfo> ();
-                var method_list = new List<MemberInfo> ();
-
-                foreach (var member in info.GetDeclarationMemberInfos ()) {
-                    if (method_regex.IsMatch (member.name)) {
-                        method_list.Add (member);
-                    } else {
-                        variable_list.Add (member);
-                    }
-                }
 
                 // 変数宣言
-                foreach (var variable in variable_list) {
+                foreach (var name in info.GetDeclarationValueNames()) {
                     // メンバ宣言
-                    builder.AppendLine (tab + variable.name + (variable.name.IndexOf (";") < 0 ? ";" : string.Empty));
+                    builder.AppendLine (tab + name);
 
                     // 改行
                     builder.AppendLine ();
                 }
 
                 // 関数宣言
-                foreach (var method in  method_list) {
+                foreach (var name in  info.GetDeclarationMethodNames()) {
                     // メンバ宣言
-                    builder.AppendLine (tab + method.name + " {}");
+                    builder.AppendLine (tab + name);
 
                     // 改行
                     builder.AppendLine ();
