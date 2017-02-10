@@ -152,38 +152,9 @@ public class PlantUMLConverter
     {
         var create_path = create_folder.TrimEnd ('/');
 
-        string tab = string.Empty;
-
         foreach (var info in contentInfoList) {
-            StringBuilder builder = new StringBuilder ();
-
-            tab = string.Empty;
-
-            // コンテンツ定義開始
-            builder.AppendLine (tab + info.GetDeclarationName ());
-            builder.AppendLine (tab + "{");
-            {
-                tab = StringBuilderSupporter.SetTab (1);
-
-                // 変数宣言
-                foreach (var name in info.GetDeclarationValueNames()) {
-                    // メンバ宣言
-                    builder.AppendLine (tab + name);
-
-                    // 改行
-                    builder.AppendLine ();
-                }
-
-                // 関数宣言
-                foreach (var name in  info.GetDeclarationMethodNames()) {
-                    // メンバ宣言
-                    builder.AppendLine (tab + name);
-
-                    // 改行
-                    builder.AppendLine ();
-                }
-            }
-            builder.AppendLine ("}");
+            // スクリプトテキスト取得
+            var builder = info.BuildScriptText ();
 
             // スクリプト生成　※上書きは行わない
             if (!StringBuilderSupporter.CreateScript (string.Format ("{0}/{1}.cs", create_path, info.GetName ()), builder.ToString (), false)) {

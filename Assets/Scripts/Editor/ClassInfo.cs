@@ -14,7 +14,43 @@ public class ClassInfo : ContentInfoBase
     /// </summary>
     public bool isAbstract = false;
 
-    public override string GetDeclarationName ()
+    public override StringBuilder BuildScriptText ()
+    {
+        var builder = new StringBuilder ();
+
+        // クラス定義開始
+        builder.AppendLine (GetDeclarationName ());
+        builder.AppendLine ("{");
+        {
+            var tab = StringBuilderSupporter.SetTab (1);
+
+            // 変数宣言
+            foreach (var name in GetDeclarationValueNames()) {
+                // メンバ宣言
+                builder.AppendLine (tab + name);
+
+                // 改行
+                builder.AppendLine ();
+            }
+
+            // 関数宣言
+            foreach (var name in  GetDeclarationMethodNames()) {
+                // メンバ宣言
+                builder.AppendLine (tab + name);
+
+                // 改行
+                builder.AppendLine ();
+            }
+        }
+        builder.AppendLine ("}");
+
+        return builder;
+    }
+
+    /// <summary>
+    /// 宣言する名前
+    /// </summary>
+    private string GetDeclarationName ()
     {
         var declaration = string.Empty;
 
@@ -44,7 +80,10 @@ public class ClassInfo : ContentInfoBase
         return declaration;
     }
 
-    public override string[] GetDeclarationValueNames ()
+    /// <summary>
+    /// 宣言する数値名
+    /// </summary>
+    private string[] GetDeclarationValueNames ()
     {
         var infos = GetDeclarationMemberInfos ();
 
@@ -54,7 +93,11 @@ public class ClassInfo : ContentInfoBase
         return infos.Where (x => !method_regex.IsMatch (x.name)).Select (x => x.name + (x.name.IndexOf (";") < 0 ? ";" : string.Empty)).ToArray ();
     }
 
-    public override string[] GetDeclarationMethodNames ()
+    /// <summary>
+    /// 宣言する関数名
+    /// </summary>
+    /// <returns>The declaration method names.</returns>
+    private string[] GetDeclarationMethodNames ()
     {
         // 関数チェック用
         var method_regex = new Regex (@"\(*\)");

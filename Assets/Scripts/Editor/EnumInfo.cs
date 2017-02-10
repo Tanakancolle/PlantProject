@@ -1,25 +1,44 @@
 ﻿using System.Linq;
+using System.Text;
 
 
 /// <summary>
 /// 列挙型情報
 /// </summary>
 public class EnumInfo : ContentInfoBase {
-    public override string GetDeclarationName ()
+
+    public override System.Text.StringBuilder BuildScriptText ()
+    {
+        var builder = new StringBuilder ();
+
+        // 列挙型定義開始
+        builder.AppendLine (GetDeclarationName ());
+        builder.AppendLine ("{");
+        {
+            var tab = StringBuilderSupporter.SetTab (1);
+
+            foreach (var name in GetDeclarationMemberNames()) {
+                builder.AppendLine (tab + name);
+            }
+        }
+        builder.AppendLine ("}");
+
+        return builder;
+    }
+
+    /// <summary>
+    /// 宣言する名前
+    /// </summary>
+    private string GetDeclarationName ()
     {
         return string.Format ("public enum {0}", contentName);
     }
 
-    public override string[] GetDeclarationValueNames ()
+    /// <summary>
+    /// 宣言するメンバ名
+    /// </summary>
+    private string[] GetDeclarationMemberNames ()
     {
-        // メンバ変数として返す
-        // TODO : 変数、メソッドを一緒にしたほうがいいかも
         return memberList.Select (x => x.name.IndexOf (",") >= 0 ? x.name : x.name + ",").ToArray();
-    }
-
-    public override string[] GetDeclarationMethodNames ()
-    {
-        // メソッドなし
-        return new string[] {};
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using System.Text;
 
 /// <summary>
 /// コンテンツ情報ベース
@@ -45,19 +46,9 @@ public abstract class ContentInfoBase
     }
 
     /// <summary>
-    /// 宣言するコンテンツ名取得
+    /// スクリプトテキスト作成
     /// </summary>
-    public abstract string GetDeclarationName ();
-
-    /// <summary>
-    /// 宣言するメンバ数名取得
-    /// </summary>
-    public abstract string[] GetDeclarationValueNames ();
-
-    /// <summary>
-    /// 宣言する関数名取得
-    /// </summary>
-    public abstract string[] GetDeclarationMethodNames ();
+    public abstract StringBuilder BuildScriptText ();
 
     /// <summary>
     /// 宣言するメンバ名取得
