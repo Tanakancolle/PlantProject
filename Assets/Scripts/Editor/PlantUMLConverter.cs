@@ -22,7 +22,8 @@ public class PlantUMLConverter
     /// </summary>
     private IContentParser[] parsers = new IContentParser[] {
         new ClassParser (),
-        new InterfaceParser ()
+        new InterfaceParser (),
+        new EnumParser(),
     };
 
     /// <summary>
@@ -36,7 +37,8 @@ public class PlantUMLConverter
         string namespace_name = string.Empty;
 
         for (int i = 0; i < lines.Length; ++i) {
-            // ネームスペースパース処理
+            // ネームスペースパース処理　※未実装
+            // TODO : 実装する！？
             namespace_name = ParseNamespace (lines, ref i);
             if (!string.IsNullOrEmpty (namespace_name)) {
                 continue;
