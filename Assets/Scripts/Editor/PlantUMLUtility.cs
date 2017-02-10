@@ -4,22 +4,8 @@
 /// <summary>
 /// PlantUML系スクリプトの共有クラス
 /// </summary>
-public static class PlantUMLUtility {
-    /// <summary>
-    /// 継承左矢印パターン
-    /// </summary>
-    private const string arrowExtensionLeftPattern = @"(?:<\|{dir}-{1,})";
-
-    /// <summary>
-    /// 継承っ右矢印パターン
-    /// </summary>
-    private const string arrowExtensionRightPattern = @"(?:-{1,}{dir}\|>)";
-
-    /// <summary>
-    /// 矢印パターン
-    /// </summary>
-    private const string arrowPattern = @"(?:<\|{dir}-{1,}|-{1,}{dir}\|>|<-{dir}-{1,}|-{1,}{dir}->)";
-
+public static class PlantUMLUtility 
+{
     /// <summary>
     /// 方向パターン
     /// </summary>
@@ -35,31 +21,11 @@ public static class PlantUMLUtility {
     };
 
     /// <summary>
-    /// 矢印パターン取得
-    /// </summary>
-    public static string GetArrowPattern() {
-        return ReplaceDirPattern (PlantUMLUtility.arrowPattern);
-    }
-
-    /// <summary>
-    /// 継承左矢印パターン取得
-    /// </summary>
-    public static string GetArrowExtensionLeftPattern() {
-        return ReplaceDirPattern (PlantUMLUtility.arrowExtensionLeftPattern);
-    }
-
-    /// <summary>
-    /// 継承右矢印パターン取得
-    /// </summary>
-    public static string GetArrowExtensionRightPattern() {
-        return ReplaceDirPattern (PlantUMLUtility.arrowExtensionRightPattern);
-    }
-
-    /// <summary>
     /// 方向パターン置き換え
     /// </summary>
     /// <returns>置き換え後文字列</returns>
-    public static string ReplaceDirPattern( string text ) {
+    public static string ReplaceDirPattern( string text )
+    {
         return text.Replace ("{dir}", PlantUMLUtility.dirPattern);
     }
 
@@ -83,7 +49,8 @@ public static class PlantUMLUtility {
     /// <summary>
     /// スペース毎に分割
     /// </summary>
-    public static string[] SplitSpace( string line ) {
+    public static string[] SplitSpace( string line ) 
+    {
         return line.Split (' ');
     }
 
@@ -93,7 +60,8 @@ public static class PlantUMLUtility {
     /// <returns><c>true</c>, ワード有り, <c>false</c> ワード無し.</returns>
     /// <param name="words">ワード配列</param>
     /// <param name="check_word">チェックワード</param>
-    public static bool CheckContainsWords(string[] words, string check_word) {
+    public static bool CheckContainsWords(string[] words, string check_word) 
+    {
         foreach (var word in words) {
             if (word.Contains (check_word)) {
                 return true;

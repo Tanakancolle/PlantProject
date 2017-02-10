@@ -29,7 +29,7 @@ public class PlantUMLConverter
     /// <summary>
     /// 変換処理
     /// </summary>
-    public void ConvertProcess (string text, string create_folder)
+    public void ConvertProcess (string text, string create_folder, PlantUMLConvertOption option)
     {
         // １行毎に分割
         var lines = text.Replace ("\r\n", "\n").Split ('\n');
@@ -56,10 +56,10 @@ public class PlantUMLConverter
         }
 
         // 矢印パース処理
-        ParseArrow (lines);
+        ParseArrow (lines, option.arrowPattern);
 
         // 継承パース処理
-        ParseExtension (lines);
+        ParseExtension (lines, option.arrowExtensionLeftPattern, option.arrowExtensionRightPattern);
 
         // スクリプト生成処理
         CreateScripts (create_folder);
@@ -83,10 +83,10 @@ public class PlantUMLConverter
     /// <summary>
     /// 矢印パース
     /// </summary>
-    private void ParseArrow (string[] lines)
+    private void ParseArrow (string[] lines, string pattern)
     {
         // 矢印パターン読み込み
-        Regex regex = new Regex (PlantUMLUtility.GetArrowPattern ());
+        var regex = new Regex (pattern);
 
         foreach (var line in lines) {
             // 矢印チェック
@@ -117,11 +117,11 @@ public class PlantUMLConverter
     /// <summary>
     /// 継承パース
     /// </summary>
-    private void ParseExtension (string[] lines)
+    private void ParseExtension (string[] lines, string left_pattern, string right_pattern)
     {
         // 継承矢印パターン
-        var left_regex = new Regex (PlantUMLUtility.GetArrowExtensionLeftPattern ());
-        var right_regex = new Regex (PlantUMLUtility.GetArrowExtensionRightPattern ());
+        var left_regex = new Regex (left_pattern);
+        var right_regex = new Regex (right_pattern);
 
         // 矢印チェック
         for (int i = 0; i < lines.Length; ++i) {
