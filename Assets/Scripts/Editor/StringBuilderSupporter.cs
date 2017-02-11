@@ -40,6 +40,10 @@ public class StringBuilderSupporter
     public static void EditUsings(StringBuilder builder,string[] usings)
     {
         foreach (var edit_using in usings) {
+            if (string.IsNullOrEmpty (edit_using)) {
+                continue;
+            }
+
             builder.AppendLine (string.Format ("using {0};", edit_using));
         }
     }

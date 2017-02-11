@@ -28,7 +28,10 @@ public class EnumParser : IContentParser {
             var member = new MemberInfo ();
 
             member.name = lines [index].TrimStart ();
-            info.AddMemberInfo (member);
+
+            if (!string.IsNullOrEmpty (member.name)) {
+                info.AddMemberInfo (member);
+            }
 
             index++;
         }

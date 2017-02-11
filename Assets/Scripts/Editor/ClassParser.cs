@@ -35,7 +35,9 @@ public class ClassParser : IContentParser
             member.name = PlantUMLUtility.ReplaceAccessModifiers (lines [index]).TrimStart ();
             member.isAbstract = PlantUMLUtility.CheckContainsWords (PlantUMLUtility.SplitSpace (lines [index]), "abstract");
 
-            info.AddMemberInfo (member);
+            if (!string.IsNullOrEmpty (member.name)) {
+                info.AddMemberInfo (member);
+            }
 
             index++;
         }

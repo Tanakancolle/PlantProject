@@ -31,8 +31,10 @@ public class InterfaceParser : IContentParser
 
             member.name = string.Format ("public {0}", lines [index].TrimStart ());
             member.isAbstract = true;
-
-            info.AddMemberInfo (member);
+             
+            if (!string.IsNullOrEmpty (member.name)) {
+                info.AddMemberInfo (member);
+            }
 
             index++;
         }
