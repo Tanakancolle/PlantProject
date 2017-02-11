@@ -1,17 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using System.Text.RegularExpressions;
-using UnityEditor;
-using System.Text;
 
 /// <summary>
 /// PlantUMLコンバーター
 /// </summary>
 public class PlantUMLConverter
-{
-
+{           
     /// <summary>
     /// コンテンツ情報リスト
     /// </summary>
@@ -29,7 +25,7 @@ public class PlantUMLConverter
     /// <summary>
     /// 変換処理
     /// </summary>
-    public void ConvertProcess(string text, string create_folder, PlantUMLConvertOption option)
+    public void ConvertProcess(string text, PlantUMLConvertOption option)
     {
         // １行毎に分割
         var lines = text.Replace ("\r\n", "\n").Split ('\n');
@@ -62,7 +58,7 @@ public class PlantUMLConverter
         ParseExtension (lines, PlantUMLUtility.ReplaceDirPattern (option.arrowExtensionLeftPattern), PlantUMLUtility.ReplaceDirPattern (option.arrowExtensionRightPattern));
 
         // スクリプト生成処理
-        CreateScripts (create_folder);
+        CreateScripts (option.createFolderPath);
     }
 
     /// <summary>

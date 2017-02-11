@@ -6,6 +6,11 @@
 public class PlantUMLConvertOption : ScriptableObject 
 {
     /// <summary>
+    /// 生成フォルダパス
+    /// </summary>
+    public string createFolderPath = "Assets/";
+
+    /// <summary>
     /// 矢印パターン
     /// </summary>
     public string arrowPattern = @"(?:<\|{dir}-{1,}|-{1,}{dir}\|>|<-{dir}-{1,}|-{1,}{dir}->)";

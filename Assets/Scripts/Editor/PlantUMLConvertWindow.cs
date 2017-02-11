@@ -5,8 +5,7 @@ using UnityEditor;
 /// PlantUML変換ウィンドウ
 /// </summary>
 public class PlantUMLConvertWindow : EditorWindow
-{
-
+{ 
     /// <summary>
     /// インスタンス
     /// </summary>
@@ -32,53 +31,43 @@ public class PlantUMLConvertWindow : EditorWindow
     private TextAsset textAsset;
 
     /// <summary>
-    /// 生成するパス
-    /// </summary>
-    private string createPath = "Assets/";
-
-    /// <summary>
     /// オプション
     /// </summary>
     private PlantUMLConvertOption convertOption;
 
     private void OnGUI()
     {
+        // オプションがなかったら生成
         if (convertOption == null) {
             convertOption = ScriptableObject.CreateInstance<PlantUMLConvertOption> ();
         }
 
-        // 対象クラス
+        // 対象クラス図
         EditorGUILayout.BeginHorizontal ();
         {
             EditorGUILayout.LabelField ("対象クラス図", GUILayout.MaxWidth (100));
             textAsset = EditorGUILayout.ObjectField (textAsset, typeof (TextAsset), false) as TextAsset;
         }
-        EditorGUILayout.EndHorizontal ();
-
-        // 生成フォルダ
-        EditorGUILayout.BeginHorizontal ();
-        {
-            EditorGUILayout.LabelField ("生成フォルダ", GUILayout.MaxWidth (100));
-            createPath = EditorGUILayout.TextField (createPath);
-        }
-        EditorGUILayout.EndHorizontal ();
+        EditorGUILayout.EndHorizontal ();                  
 
         // オプション
         EditorGUILayout.BeginVertical (GUI.skin.box);
-        {
+        { 
             EditorGUILayout.LabelField ("オプション");
+            convertOption.createFolderPath = EditorGUILayout.TextField ("生成フォルダ", convertOption.createFolderPath);
             convertOption.arrowPattern = EditorGUILayout.TextField ("矢印パターン", convertOption.arrowPattern);
             convertOption.arrowExtensionLeftPattern = EditorGUILayout.TextField ("左継承矢印パターン", convertOption.arrowExtensionLeftPattern);
             convertOption.arrowExtensionRightPattern = EditorGUILayout.TextField ("右継承矢印パターン", convertOption.arrowExtensionRightPattern);
 
+            // オプション保存＆読み込み処理
             EditorGUILayout.BeginHorizontal (GUI.skin.box);
             {
-                if (GUILayout.Button ("設定保存")) {
+                if (GUILayout.Button ("オプション保存")) {
                     var save_path = EditorUtility.SaveFilePanel ("", "Assets", "", "asset");
                     SaveOption (save_path);
                 }
 
-                if (GUILayout.Button ("設定読み込み")) {
+                if (GUILayout.Button ("オプション読み込み")) {
                     var load_path = EditorUtility.OpenFilePanel ("", "Assets", "asset");
                     LoadOption (load_path);
                 }
@@ -87,9 +76,10 @@ public class PlantUMLConvertWindow : EditorWindow
         }
         EditorGUILayout.EndVertical ();
 
+        // スクリプト生成開始
         if (GUILayout.Button ("生成開始")) {
             var converter = new PlantUMLConverter ();
-            converter.ConvertProcess (textAsset.text, createPath, convertOption);
+            converter.ConvertProcess (textAsset.text, convertOption);
         }
     }
 
