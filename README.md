@@ -1,4 +1,9 @@
 # PlantProject
+## 機能
+PlantUMLのクラス図からC#のスケルトンコードを生成します。
+詳しくは↓を見てください
+http://qiita.com/Tanakancolle/items/cb5cc76f84da3dc97f24
+
 ## License
 The MIT License (MIT)
 
