@@ -29,7 +29,7 @@ public class PlantUMLConverter
     /// <summary>
     /// 変換処理
     /// </summary>
-    public void ConvertProcess (string text, string create_folder, PlantUMLConvertOption option)
+    public void ConvertProcess(string text, string create_folder, PlantUMLConvertOption option)
     {
         // １行毎に分割
         var lines = text.Replace ("\r\n", "\n").Split ('\n');
@@ -56,10 +56,10 @@ public class PlantUMLConverter
         }
 
         // 矢印パース処理
-        ParseArrow (lines, option.arrowPattern);
+        ParseArrow (lines, PlantUMLUtility.ReplaceDirPattern (option.arrowPattern));
 
         // 継承パース処理
-        ParseExtension (lines, option.arrowExtensionLeftPattern, option.arrowExtensionRightPattern);
+        ParseExtension (lines, PlantUMLUtility.ReplaceDirPattern (option.arrowExtensionLeftPattern), PlantUMLUtility.ReplaceDirPattern (option.arrowExtensionRightPattern));
 
         // スクリプト生成処理
         CreateScripts (create_folder);
@@ -68,22 +68,22 @@ public class PlantUMLConverter
     /// <summary>
     /// ネームスペースパース
     /// </summary>
-    private string ParseNamespace (string[] lines, ref int index)
+    private string ParseNamespace(string[] lines, ref int index)
     {
-        var words = PlantUMLUtility.SplitSpace (lines [index].TrimStart ());
+        var words = PlantUMLUtility.SplitSpace (lines[index].TrimStart ());
 
         // ネームスペースチェック
-        if (!words [0].Contains ("namespace")) {
+        if (!words[0].Contains ("namespace")) {
             return string.Empty;
         }
 
-        return words [1];
+        return words[1];
     }
 
     /// <summary>
     /// 矢印パース
     /// </summary>
-    private void ParseArrow (string[] lines, string pattern)
+    private void ParseArrow(string[] lines, string pattern)
     {
         // 矢印パターン読み込み
         var regex = new Regex (pattern);
@@ -117,7 +117,7 @@ public class PlantUMLConverter
     /// <summary>
     /// 継承パース
     /// </summary>
-    private void ParseExtension (string[] lines, string left_pattern, string right_pattern)
+    private void ParseExtension(string[] lines, string left_pattern, string right_pattern)
     {
         // 継承矢印パターン
         var left_regex = new Regex (left_pattern);
@@ -125,19 +125,19 @@ public class PlantUMLConverter
 
         // 矢印チェック
         for (int i = 0; i < lines.Length; ++i) {
-            if (left_regex.IsMatch (lines [i])) {
-                var contents = left_regex.Split (lines [i]).Select (x => x.Trim ()).ToArray ();
+            if (left_regex.IsMatch (lines[i])) {
+                var contents = left_regex.Split (lines[i]).Select (x => x.Trim ()).ToArray ();
 
-                var base_content = contentInfoList.FirstOrDefault (x => x.GetName () == contents [0]);
-                var target_content = contentInfoList.FirstOrDefault (x => x.GetName () == contents [1]);
+                var base_content = contentInfoList.FirstOrDefault (x => x.GetName () == contents[0]);
+                var target_content = contentInfoList.FirstOrDefault (x => x.GetName () == contents[1]);
 
                 // 継承情報追加
                 target_content.AddInhritanceInfo (base_content);
-            } else if (right_regex.IsMatch (lines [i])) {
-                var contents = right_regex.Split (lines [i]).Select (x => x.Trim ()).ToArray ();
+            } else if (right_regex.IsMatch (lines[i])) {
+                var contents = right_regex.Split (lines[i]).Select (x => x.Trim ()).ToArray ();
 
-                var base_content = contentInfoList.FirstOrDefault (x => x.GetName () == contents [1]);
-                var target_content = contentInfoList.FirstOrDefault (x => x.GetName () == contents [0]);
+                var base_content = contentInfoList.FirstOrDefault (x => x.GetName () == contents[1]);
+                var target_content = contentInfoList.FirstOrDefault (x => x.GetName () == contents[0]);
 
                 // 継承情報追加
                 target_content.AddInhritanceInfo (base_content);
@@ -148,7 +148,7 @@ public class PlantUMLConverter
     /// <summary>
     /// スクリプト群生成
     /// </summary>
-    private void CreateScripts (string create_folder)
+    private void CreateScripts(string create_folder)
     {
         var create_path = create_folder.TrimEnd ('/');
 

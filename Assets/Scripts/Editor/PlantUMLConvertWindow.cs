@@ -1,12 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
 
 /// <summary>
 /// PlantUML変換ウィンドウ
 /// </summary>
-public class PlantUMLConvertWindow : EditorWindow {
+public class PlantUMLConvertWindow : EditorWindow
+{
 
     /// <summary>
     /// インスタンス
@@ -16,7 +15,7 @@ public class PlantUMLConvertWindow : EditorWindow {
     /// <summary>
     /// ウィンドウ生成
     /// </summary>
-    [MenuItem("UML/ConvertWindow")]
+    [MenuItem ("UML/ConvertWindow")]
     static private void CreateWindow()
     {
         if (umlWindow == null) {
@@ -42,7 +41,7 @@ public class PlantUMLConvertWindow : EditorWindow {
     /// </summary>
     private PlantUMLConvertOption convertOption;
 
-    private void OnGUI() 
+    private void OnGUI()
     {
         if (convertOption == null) {
             convertOption = ScriptableObject.CreateInstance<PlantUMLConvertOption> ();
@@ -52,7 +51,7 @@ public class PlantUMLConvertWindow : EditorWindow {
         EditorGUILayout.BeginHorizontal ();
         {
             EditorGUILayout.LabelField ("対象クラス図", GUILayout.MaxWidth (100));
-            textAsset = EditorGUILayout.ObjectField (textAsset, typeof(TextAsset), false) as TextAsset;
+            textAsset = EditorGUILayout.ObjectField (textAsset, typeof (TextAsset), false) as TextAsset;
         }
         EditorGUILayout.EndHorizontal ();
 
@@ -68,9 +67,9 @@ public class PlantUMLConvertWindow : EditorWindow {
         EditorGUILayout.BeginVertical (GUI.skin.box);
         {
             EditorGUILayout.LabelField ("オプション");
-            //convertOption.arrowPattern = EditorGUILayout.TextField ("矢印パターン", convertOption.arrowPattern);
-            //convertOption.arrowExtensionLeftPattern = EditorGUILayout.TextField ("左継承矢印パターン", convertOption.arrowExtensionLeftPattern);
-            //convertOption.arrowExtensionRightPattern = EditorGUILayout.TextField ("右継承矢印パターン", convertOption.arrowExtensionRightPattern);
+            convertOption.arrowPattern = EditorGUILayout.TextField ("矢印パターン", convertOption.arrowPattern);
+            convertOption.arrowExtensionLeftPattern = EditorGUILayout.TextField ("左継承矢印パターン", convertOption.arrowExtensionLeftPattern);
+            convertOption.arrowExtensionRightPattern = EditorGUILayout.TextField ("右継承矢印パターン", convertOption.arrowExtensionRightPattern);
 
             EditorGUILayout.BeginHorizontal (GUI.skin.box);
             {
@@ -83,7 +82,7 @@ public class PlantUMLConvertWindow : EditorWindow {
                     var load_path = EditorUtility.OpenFilePanel ("", "Assets", "asset");
                     LoadOption (load_path);
                 }
-            } 
+            }
             EditorGUILayout.EndHorizontal ();
         }
         EditorGUILayout.EndVertical ();
@@ -97,7 +96,7 @@ public class PlantUMLConvertWindow : EditorWindow {
     /// <summary>
     /// 設定保存
     /// </summary>
-    private void SaveOption(string path) 
+    private void SaveOption(string path)
     {
         if (string.IsNullOrEmpty (path)) {
             return;
@@ -126,4 +125,3 @@ public class PlantUMLConvertWindow : EditorWindow {
         convertOption = option.Copy ();
     }
 }
-
