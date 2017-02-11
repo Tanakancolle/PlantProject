@@ -1,10 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
+﻿                                   
 public class EnumParser : IContentParser {
     public ContentInfoBase[] Parse (string[] lines, ref int index, string namespace_name = "")
-    {
+    {                              
         var words = PlantUMLUtility.SplitSpace (lines [index]);
 
         // 列挙型チェック

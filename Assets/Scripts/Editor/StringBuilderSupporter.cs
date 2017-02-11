@@ -1,9 +1,6 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.IO;
+﻿using System.IO;
 using UnityEditor;
 using System.Text;
-using System.Collections.Generic;
 
 /// <summary>
 /// ビルダー補助クラス
@@ -39,6 +36,10 @@ public class StringBuilderSupporter
     /// <param name="usings">ネームスペース名配列</param>
     public static void EditUsings(StringBuilder builder,string[] usings)
     {
+        if (usings == null) {
+            return;
+        }
+
         foreach (var edit_using in usings) {
             if (string.IsNullOrEmpty (edit_using)) {
                 continue;

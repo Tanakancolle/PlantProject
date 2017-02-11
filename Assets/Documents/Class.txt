@@ -42,12 +42,12 @@ PlantUMLConverter -left-> StringBuilderSupporter
 
 IContentParser -> ContentInfoBase
 
-IContentParser <|-down- ClassParser
-IContentParser <|-down- InterfaceParser
-IContentParser <|-down- EnumParser
+IContentParser <|down- ClassParser
+IContentParser <|down- InterfaceParser
+IContentParser <|down- EnumParser
 
-ContentInfoBase <|-down- ClassInfo
-ContentInfoBase <|-down- InterfaceInfo
-ContentInfoBase <|-down- EnumInfo
+ContentInfoBase <|down- ClassInfo
+ContentInfoBase <|down- InterfaceInfo
+ContentInfoBase <|down- EnumInfo
 
 @enduml
