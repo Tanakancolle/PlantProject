@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 /// <summary>
 /// PlantUML変換オプション
@@ -31,16 +32,37 @@ public class PlantUMLConvertOption : ScriptableObject
     public bool isNonCreateMember = false;
 
     /// <summary>
+    /// 宣言Using
+    /// </summary>
+    public string[] declarationUsings;
+
+    /// <summary>
     /// コピー
     /// </summary>
     public PlantUMLConvertOption Copy() 
     {
         var option = ScriptableObject.CreateInstance<PlantUMLConvertOption> ();
 
+        Copy (option);
+
+        return option;
+    }
+
+    /// <summary>
+    /// コピー
+    /// </summary>
+    /// <param name="option">書き込むオプション</param>
+    public void Copy(PlantUMLConvertOption option)
+    {
+        option.createFolderPath = createFolderPath;
         option.arrowPattern = arrowPattern;
         option.arrowExtensionLeftPattern = arrowExtensionLeftPattern;
         option.arrowExtensionRightPattern = arrowExtensionRightPattern;
+        option.isNonCreateMember = isNonCreateMember;
 
-        return option;
+        option.declarationUsings = new string[declarationUsings.Length];
+        for( int i = 0; i < declarationUsings.Length; ++i) {
+            option.declarationUsings[i] = declarationUsings[i];
+        }
     }
 }

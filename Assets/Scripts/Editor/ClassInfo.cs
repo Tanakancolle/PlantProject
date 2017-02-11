@@ -18,6 +18,12 @@ public class ClassInfo : ContentInfoBase
     {
         var builder = new StringBuilder ();
 
+        // using宣言
+        StringBuilderSupporter.EditUsings (builder, option.declarationUsings);
+
+        // 改行
+        builder.AppendLine ();
+
         // クラス定義開始
         builder.AppendLine (GetDeclarationName ());
         builder.AppendLine ("{");

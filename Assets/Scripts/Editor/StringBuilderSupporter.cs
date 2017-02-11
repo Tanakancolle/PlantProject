@@ -31,6 +31,18 @@ public class StringBuilderSupporter
     /// タブのスペーズ数
     /// </summary>
     private const int kTAB_TO_SPACE_NUM = 4;
+        
+    /// <summary>
+    /// using定義
+    /// </summary>
+    /// <param name="builder">ストリングビルダー</param>
+    /// <param name="usings">ネームスペース名配列</param>
+    public static void EditUsings(StringBuilder builder,string[] usings)
+    {
+        foreach (var edit_using in usings) {
+            builder.AppendLine (string.Format ("using {0};", edit_using));
+        }
+    }
 
     /// <summary>
     /// 名前空間定義 ※「}」あり
