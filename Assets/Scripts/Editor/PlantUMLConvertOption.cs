@@ -14,17 +14,17 @@ public class PlantUMLConvertOption : ScriptableObject
     /// <summary>
     /// 矢印パターン
     /// </summary>
-    public string arrowPattern = @"(?:<\|{dir}-{1,}|-{1,}{dir}\|>|<-{dir}-{1,}|-{1,}{dir}->)";
+    public string arrowPattern = @"(?:<\|-{0,}{dir}-{1,}|-{1,}{dir}-{0,}\|>|<-{dir}-{1,}|-{1,}{dir}->)";
 
     /// <summary>
     /// 拡張左矢印パターン
     /// </summary>
-    public string arrowExtensionLeftPattern = @"(?:<\|{dir}-{1,})";
+    public string arrowExtensionLeftPattern = @"(?:<\|-{0,}{dir}-{1,})";
 
     /// <summary>
     /// 拡張右矢印パターン
     /// </summary>
-    public string arrowExtensionRightPattern = @"(?:-{1,}{dir}\|>)";
+    public string arrowExtensionRightPattern = @"(?:-{1,}{dir}-{0,}\|>)";
 
     /// <summary>
     /// メンバの非生成フラグ
