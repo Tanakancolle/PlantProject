@@ -38,7 +38,7 @@ PlantUMLConvertWindow --> PlantUMLConvertOption
 PlantUMLConverter -right-> PlantUMLConvertOption
 PlantUMLConverter -down-> IContentParser
 PlantUMLConverter --> ContentInfoBase
-PlantUMLConverter -left-> StringBuilderSuppoter
+PlantUMLConverter -left-> StringBuilderSupporter
 
 IContentParser -> ContentInfoBase
 

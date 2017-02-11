@@ -95,7 +95,7 @@ public class PlantUMLConvertWindow : EditorWindow
         // スクリプト生成開始
         if (GUILayout.Button ("生成開始")) {
             if( textAsset == null ) {
-                Debug.LogError("TextAssetが設定されていません");
+                Debug.LogError("クラス図が指定されていません");
                 return;
             }
 
