@@ -153,7 +153,9 @@ public class PlantUMLConverter
             var builder = info.BuildScriptText (option);
 
             // スクリプト生成　※上書きは行わない
-            if (!StringBuilderSupporter.CreateScript (string.Format ("{0}/{1}.cs", create_path, info.GetName ()), builder.ToString (), false)) {
+            if (StringBuilderSupporter.CreateScript (string.Format ("{0}/{1}.cs", create_path, info.GetName ()), builder.ToString (), false)) {
+                Debug.LogFormat ("生成しました！：{0}.cs", info.GetName ());
+            } else {
                 Debug.LogWarningFormat ("既に存在するため生成されませんでした：{0}.cs", info.GetName ());
             }
         }
