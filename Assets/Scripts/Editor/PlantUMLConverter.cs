@@ -81,6 +81,11 @@ public class PlantUMLConverter
     /// </summary>
     private void ParseArrow(string[] lines, string pattern)
     {
+        // パターンが空だったら終了
+        if (string.IsNullOrEmpty (pattern)) {
+            return;
+        }
+
         // 矢印パターン読み込み
         var regex = new Regex (pattern);
 
@@ -116,12 +121,25 @@ public class PlantUMLConverter
     private void ParseExtension(string[] lines, string left_pattern, string right_pattern)
     {
         // 継承矢印パターン
-        var left_regex = new Regex (left_pattern);
-        var right_regex = new Regex (right_pattern);
+        Regex left_regex = null;
+        Regex right_regex = null;
+
+        if (!string.IsNullOrEmpty (left_pattern)) {
+            left_regex = new Regex (left_pattern);
+        }
+
+        if (!string.IsNullOrEmpty (right_pattern)) {
+            right_regex = new Regex (right_pattern);
+        }
+
+        // 両方共パターンが空だったら終了
+        if( left_regex == null && right_regex == null) {
+            return;
+        }
 
         // 矢印チェック
         for (int i = 0; i < lines.Length; ++i) {
-            if (left_regex.IsMatch (lines[i])) {
+            if (left_regex != null && left_regex.IsMatch (lines[i])) {
                 var contents = left_regex.Split (lines[i]).Select (x => x.Trim ()).ToArray ();
 
                 var base_content = contentInfoList.FirstOrDefault (x => x.GetName () == contents[0]);
@@ -129,7 +147,7 @@ public class PlantUMLConverter
 
                 // 継承情報追加
                 target_content.AddInhritanceInfo (base_content);
-            } else if (right_regex.IsMatch (lines[i])) {
+            } else if (right_regex != null && right_regex.IsMatch (lines[i])) {
                 var contents = right_regex.Split (lines[i]).Select (x => x.Trim ()).ToArray ();
 
                 var base_content = contentInfoList.FirstOrDefault (x => x.GetName () == contents[1]);
