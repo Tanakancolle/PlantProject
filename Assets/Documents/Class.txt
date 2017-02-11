@@ -1,0 +1,53 @@
+@startuml
+
+class PlantUMLConvertWindow {
+  +static CreateWindow()
+}
+
+class PlantUMLConverter {
+  -IContentParser[] parsers
+  +void ConvertProcess()
+}
+
+interface IContentParser {
+   ContentInfoBase[] Parse(string[] lines, ref int index, string namespace_name = "")
+}
+
+abstract class ContentInfoBase {
+  +abstract StringBuilder BuildScriptText(PlantUMLConvertOption option)
+}
+
+class PlantUMLConvertOption {
+  +string createFolderPath
+  +string arrowPattern
+  +string arrowExtensionLeftPattern
+  +string arrowExtensionRightPattern
+  +bool isNonCreateMember
+  +string[] declarationUsings
+
+  +void Copy()
+  +void Copy(PlantUMLConvertOption option)
+}
+
+class PlantUMLUtility {
+}
+
+PlantUMLConvertWindow -down-> PlantUMLConverter
+PlantUMLConvertWindow --> PlantUMLConvertOption
+
+PlantUMLConverter -right-> PlantUMLConvertOption
+PlantUMLConverter -down-> IContentParser
+PlantUMLConverter --> ContentInfoBase
+PlantUMLConverter -left-> StringBuilderSuppoter
+
+IContentParser -> ContentInfoBase
+
+IContentParser -down-> ClassParser
+IContentParser -down-> InterfaceParser
+IContentParser -down-> EnumParser
+
+ContentInfoBase -down-> ClassInfo
+ContentInfoBase -down-> InterfaceInfo
+ContentInfoBase -down-> EnumInfo
+
+@enduml
