@@ -14,7 +14,7 @@ public class ClassInfo : ContentInfoBase
     /// </summary>
     public bool isAbstract = false;
 
-    public override StringBuilder BuildScriptText ()
+    public override StringBuilder BuildScriptText(PlantUMLConvertOption option)
     {
         var builder = new StringBuilder ();
 
@@ -22,24 +22,27 @@ public class ClassInfo : ContentInfoBase
         builder.AppendLine (GetDeclarationName ());
         builder.AppendLine ("{");
         {
-            var tab = StringBuilderSupporter.SetTab (1);
+            // メンバ宣言処理
+            if (!option.isNonCreateMember) {
+                var tab = StringBuilderSupporter.SetTab (1);
 
-            // 変数宣言
-            foreach (var name in GetDeclarationValueNames()) {
-                // メンバ宣言
-                builder.AppendLine (tab + name);
+                // 変数宣言
+                foreach (var name in GetDeclarationValueNames ()) {
+                    // メンバ宣言
+                    builder.AppendLine (tab + name);
 
-                // 改行
-                builder.AppendLine ();
-            }
+                    // 改行
+                    builder.AppendLine ();
+                }
 
-            // 関数宣言
-            foreach (var name in  GetDeclarationMethodNames()) {
-                // メンバ宣言
-                builder.AppendLine (tab + name);
+                // 関数宣言
+                foreach (var name in GetDeclarationMethodNames ()) {
+                    // メンバ宣言
+                    builder.AppendLine (tab + name);
 
-                // 改行
-                builder.AppendLine ();
+                    // 改行
+                    builder.AppendLine ();
+                }
             }
         }
         builder.AppendLine ("}");
@@ -50,7 +53,7 @@ public class ClassInfo : ContentInfoBase
     /// <summary>
     /// 宣言する名前
     /// </summary>
-    private string GetDeclarationName ()
+    private string GetDeclarationName()
     {
         var declaration = string.Empty;
 
@@ -66,7 +69,7 @@ public class ClassInfo : ContentInfoBase
             StringBuilder builder = new StringBuilder ();
 
             // 継承を再現
-            foreach (var inheritance in inheritanceList.Select(x => x.GetName())) {
+            foreach (var inheritance in inheritanceList.Select (x => x.GetName ())) {
                 if (builder.Length > 0) {
                     builder.Append (", ");
                 }
@@ -83,7 +86,7 @@ public class ClassInfo : ContentInfoBase
     /// <summary>
     /// 宣言する数値名
     /// </summary>
-    private string[] GetDeclarationValueNames ()
+    private string[] GetDeclarationValueNames()
     {
         var infos = GetDeclarationMemberInfos ();
 
@@ -97,7 +100,7 @@ public class ClassInfo : ContentInfoBase
     /// 宣言する関数名
     /// </summary>
     /// <returns>The declaration method names.</returns>
-    private string[] GetDeclarationMethodNames ()
+    private string[] GetDeclarationMethodNames()
     {
         // 関数チェック用
         var method_regex = new Regex (@"\(*\)");
@@ -113,12 +116,12 @@ public class ClassInfo : ContentInfoBase
         }
 
         // メンバ関数名
-        list.AddRange (memberList.Where(x=>method_regex.IsMatch(x.name)).Select (x => { 
-            if( x.isAbstract ) {
-                return x.name.IndexOf(";") < 0 ? x.name + ";" : x.name;
+        list.AddRange (memberList.Where (x => method_regex.IsMatch (x.name)).Select (x => {
+            if (x.isAbstract) {
+                return x.name.IndexOf (";") < 0 ? x.name + ";" : x.name;
             }
 
-            return x.name.Replace(";",string.Empty) + " {}";
+            return x.name.Replace (";", string.Empty) + " {}";
         }));
 
         return list.ToArray ();

@@ -58,6 +58,7 @@ public class PlantUMLConvertWindow : EditorWindow
             convertOption.arrowPattern = EditorGUILayout.TextField ("矢印パターン", convertOption.arrowPattern);
             convertOption.arrowExtensionLeftPattern = EditorGUILayout.TextField ("左継承矢印パターン", convertOption.arrowExtensionLeftPattern);
             convertOption.arrowExtensionRightPattern = EditorGUILayout.TextField ("右継承矢印パターン", convertOption.arrowExtensionRightPattern);
+            convertOption.isNonCreateMember = EditorGUILayout.Toggle ("メンバの非生成", convertOption.isNonCreateMember);
 
             // オプション保存＆読み込み処理
             EditorGUILayout.BeginHorizontal (GUI.skin.box);

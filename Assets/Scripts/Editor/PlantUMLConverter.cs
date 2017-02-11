@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 /// PlantUMLコンバーター
 /// </summary>
 public class PlantUMLConverter
-{           
+{
     /// <summary>
     /// コンテンツ情報リスト
     /// </summary>
@@ -58,7 +58,7 @@ public class PlantUMLConverter
         ParseExtension (lines, PlantUMLUtility.ReplaceDirPattern (option.arrowExtensionLeftPattern), PlantUMLUtility.ReplaceDirPattern (option.arrowExtensionRightPattern));
 
         // スクリプト生成処理
-        CreateScripts (option.createFolderPath);
+        CreateScripts (option);
     }
 
     /// <summary>
@@ -144,13 +144,13 @@ public class PlantUMLConverter
     /// <summary>
     /// スクリプト群生成
     /// </summary>
-    private void CreateScripts(string create_folder)
+    private void CreateScripts(PlantUMLConvertOption option)
     {
-        var create_path = create_folder.TrimEnd ('/');
+        var create_path = option.createFolderPath.TrimEnd ('/');
 
         foreach (var info in contentInfoList) {
             // スクリプトテキスト取得
-            var builder = info.BuildScriptText ();
+            var builder = info.BuildScriptText (option);
 
             // スクリプト生成　※上書きは行わない
             if (!StringBuilderSupporter.CreateScript (string.Format ("{0}/{1}.cs", create_path, info.GetName ()), builder.ToString (), false)) {

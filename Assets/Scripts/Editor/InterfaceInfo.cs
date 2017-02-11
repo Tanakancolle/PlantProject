@@ -4,8 +4,9 @@ using System.Text;
 /// <summary>
 /// インターフェース情報
 /// </summary>
-public class InterfaceInfo : ContentInfoBase {
-    public override System.Text.StringBuilder BuildScriptText ()
+public class InterfaceInfo : ContentInfoBase
+{
+    public override StringBuilder BuildScriptText(PlantUMLConvertOption option)
     {
         var builder = new StringBuilder ();
 
@@ -13,15 +14,18 @@ public class InterfaceInfo : ContentInfoBase {
         builder.AppendLine (GetDeclarationName ());
         builder.AppendLine ("{");
         {
-            var tab = StringBuilderSupporter.SetTab (1);
+            // メンバ宣言処理
+            if (!option.isNonCreateMember) {
+                var tab = StringBuilderSupporter.SetTab (1);
 
-            // 変数宣言
-            foreach (var name in GetDeclarationMethodNames()) {
-                // メソッド宣言
-                builder.AppendLine (tab + name);
+                // 変数宣言
+                foreach (var name in GetDeclarationMethodNames ()) {
+                    // メソッド宣言
+                    builder.AppendLine (tab + name);
 
-                // 改行
-                builder.AppendLine ();
+                    // 改行
+                    builder.AppendLine ();
+                }
             }
         }
         builder.AppendLine ("}");
@@ -32,7 +36,7 @@ public class InterfaceInfo : ContentInfoBase {
     /// <summary>
     /// 宣言する名前
     /// </summary>
-    private string GetDeclarationName ()
+    private string GetDeclarationName()
     {
         return string.Format ("public interface {0}", contentName);
     }
@@ -41,7 +45,7 @@ public class InterfaceInfo : ContentInfoBase {
     /// 宣言するメソッド名
     /// </summary>
     /// <returns>The declaration method names.</returns>
-    private string[] GetDeclarationMethodNames ()
+    private string[] GetDeclarationMethodNames()
     {
         var infos = GetDeclarationMemberInfos ();
 

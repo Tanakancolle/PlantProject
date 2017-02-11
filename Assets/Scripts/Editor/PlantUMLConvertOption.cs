@@ -26,6 +26,11 @@ public class PlantUMLConvertOption : ScriptableObject
     public string arrowExtensionRightPattern = @"(?:-{1,}{dir}\|>)";
 
     /// <summary>
+    /// メンバの非生成フラグ
+    /// </summary>
+    public bool isNonCreateMember = false;
+
+    /// <summary>
     /// コピー
     /// </summary>
     public PlantUMLConvertOption Copy() 

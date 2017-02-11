@@ -32,7 +32,7 @@ public abstract class ContentInfoBase
     /// <summary>
     /// コンテンツ名設定
     /// </summary>
-    public virtual void SetName (string name)
+    public virtual void SetName(string name)
     {
         contentName = name;
     }
@@ -40,7 +40,7 @@ public abstract class ContentInfoBase
     /// <summary>
     /// コンテンツ名取得
     /// </summary>
-    public virtual string GetName ()
+    public virtual string GetName()
     {
         return contentName;
     }
@@ -48,12 +48,12 @@ public abstract class ContentInfoBase
     /// <summary>
     /// スクリプトテキスト作成
     /// </summary>
-    public abstract StringBuilder BuildScriptText ();
+    public abstract StringBuilder BuildScriptText(PlantUMLConvertOption option);
 
     /// <summary>
     /// 宣言するメンバ名取得
     /// </summary>
-    protected virtual List<MemberInfo> GetDeclarationMemberInfos ()
+    protected virtual List<MemberInfo> GetDeclarationMemberInfos()
     {
         var list = new List<MemberInfo> ();
         foreach (var info in inheritanceList) {
@@ -68,7 +68,7 @@ public abstract class ContentInfoBase
     /// <summary>
     /// 抽象メンバー名取得
     /// </summary>
-    public virtual MemberInfo[] GetAbstractMemberInfos ()
+    public virtual MemberInfo[] GetAbstractMemberInfos()
     {
         if (memberList == null) {
             return null;
@@ -80,7 +80,7 @@ public abstract class ContentInfoBase
     /// <summary>
     /// メンバ情報追加
     /// </summary>
-    public virtual void AddMemberInfo (MemberInfo info)
+    public virtual void AddMemberInfo(MemberInfo info)
     {
         memberList.Add (info);
     }
@@ -88,7 +88,7 @@ public abstract class ContentInfoBase
     /// <summary>
     /// 継承情報追加
     /// </summary>
-    public virtual void AddInhritanceInfo (ContentInfoBase info)
+    public virtual void AddInhritanceInfo(ContentInfoBase info)
     {
         inheritanceList.Add (info);
     }
