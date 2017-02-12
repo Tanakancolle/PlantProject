@@ -20,7 +20,7 @@ public class InterfaceInfo : ContentInfoBase
         int tab_num = 0;
 
         // ネームスペース開始チェック
-        if (!string.IsNullOrEmpty (namespaceName)) {
+        if (!option.isNonCreateNamespace && !string.IsNullOrEmpty (namespaceName)) {
             builder.AppendLine (string.Format ("namespace {0}", namespaceName));
             builder.AppendLine ("{");
             tab_num++;
@@ -51,7 +51,7 @@ public class InterfaceInfo : ContentInfoBase
         builder.AppendLine (tab + "}");
 
         // ネームスペース終了チェック
-        if (!string.IsNullOrEmpty (namespaceName)) {
+        if (!option.isNonCreateNamespace && !string.IsNullOrEmpty (namespaceName)) {
             builder.AppendLine ("}");
         }
 

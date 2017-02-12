@@ -14,7 +14,7 @@ public class EnumInfo : ContentInfoBase
         int tab_num = 0;
 
         // ネームスペース開始チェック
-        if (!string.IsNullOrEmpty (namespaceName)) {
+        if (!option.isNonCreateNamespace && !string.IsNullOrEmpty (namespaceName)) {
             builder.AppendLine (string.Format ("namespace {0}", namespaceName));
             builder.AppendLine ("{");
             tab_num++;
@@ -37,7 +37,7 @@ public class EnumInfo : ContentInfoBase
         builder.AppendLine (tab + "}");
 
         // ネームスペース終了チェック
-        if (!string.IsNullOrEmpty (namespaceName)) {
+        if (!option.isNonCreateNamespace && !string.IsNullOrEmpty (namespaceName)) {
             builder.AppendLine ("}");
         }
 

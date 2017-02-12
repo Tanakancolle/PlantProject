@@ -27,6 +27,11 @@ public class PlantUMLConvertOption : ScriptableObject
     public string arrowExtensionRightPattern = @"(?:-{1,}{dir}-{0,}\|>)";
 
     /// <summary>
+    /// ネームスペースの非生成フラグ
+    /// </summary>
+    public bool isNonCreateNamespace = false;
+
+    /// <summary>
     /// メンバの非生成フラグ
     /// </summary>
     public bool isNonCreateMember = false;
@@ -58,6 +63,7 @@ public class PlantUMLConvertOption : ScriptableObject
         option.arrowPattern = arrowPattern;
         option.arrowExtensionLeftPattern = arrowExtensionLeftPattern;
         option.arrowExtensionRightPattern = arrowExtensionRightPattern;
+        option.isNonCreateNamespace = isNonCreateNamespace;
         option.isNonCreateMember = isNonCreateMember;
 
         option.declarationUsings = new string[declarationUsings.Length];

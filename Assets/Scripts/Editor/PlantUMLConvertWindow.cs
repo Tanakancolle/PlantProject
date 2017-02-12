@@ -68,6 +68,7 @@ public class PlantUMLConvertWindow : EditorWindow
             convertOption.arrowPattern = EditorGUILayout.TextField ("矢印パターン", convertOption.arrowPattern);
             convertOption.arrowExtensionLeftPattern = EditorGUILayout.TextField ("左継承矢印パターン", convertOption.arrowExtensionLeftPattern);
             convertOption.arrowExtensionRightPattern = EditorGUILayout.TextField ("右継承矢印パターン", convertOption.arrowExtensionRightPattern);
+            convertOption.isNonCreateNamespace = EditorGUILayout.Toggle ("名前空間の非生成", convertOption.isNonCreateNamespace);
             convertOption.isNonCreateMember = EditorGUILayout.Toggle ("メンバの非生成", convertOption.isNonCreateMember);
 
             // using配列設定
