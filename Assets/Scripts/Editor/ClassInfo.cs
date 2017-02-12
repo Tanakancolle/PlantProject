@@ -24,13 +24,25 @@ public class ClassInfo : ContentInfoBase
         // 改行
         builder.AppendLine ();
 
-        // クラス定義開始
-        builder.AppendLine (GetDeclarationName ());
-        builder.AppendLine ("{");
-        {
+        var tab = string.Empty;
+        int tab_num = 0;
+
+        // ネームスペース開始チェック
+        if (!string.IsNullOrEmpty (namespaceName)) {
+            builder.AppendLine (string.Format ("namespace {0}", namespaceName));
+            builder.AppendLine ("{");
+            tab_num++;
+        }
+
+        // クラス定義開始         
+        tab = StringBuilderSupporter.SetTab (tab_num);
+        builder.AppendLine (tab + GetDeclarationName ());
+        builder.AppendLine (tab + "{");
+        tab_num++;
+        {                      
             // メンバ宣言処理
             if (!option.isNonCreateMember) {
-                var tab = StringBuilderSupporter.SetTab (1);
+                tab = StringBuilderSupporter.SetTab (tab_num);
 
                 // 変数宣言
                 foreach (var name in GetDeclarationValueNames ()) {
@@ -51,7 +63,14 @@ public class ClassInfo : ContentInfoBase
                 }
             }
         }
-        builder.AppendLine ("}");
+        tab_num--;
+        tab = StringBuilderSupporter.SetTab (tab_num);
+        builder.AppendLine (tab + "}");
+                                         
+        // ネームスペース終了チェック
+        if (!string.IsNullOrEmpty (namespaceName)) {
+            builder.AppendLine ("}");
+        }                             
 
         return builder;
     }

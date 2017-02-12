@@ -11,6 +11,9 @@ public class EnumParser : IContentParser {
 
         var info = new EnumInfo ();
 
+        // ネームスペース設定
+        info.SetNamespace (namespace_name);
+
         // 名前設定
         info.SetName(lines[index].Replace("enum", string.Empty).Replace("{",string.Empty).Trim());
 
@@ -31,9 +34,7 @@ public class EnumParser : IContentParser {
             }
 
             index++;
-        }
-
-        index++;
+        }             
 
         return new ContentInfoBase[] { info };
     }

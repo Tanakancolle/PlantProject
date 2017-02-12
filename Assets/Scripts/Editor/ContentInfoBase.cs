@@ -38,6 +38,14 @@ public abstract class ContentInfoBase
     }
 
     /// <summary>
+    /// ネームスペース設定
+    /// </summary>                           
+    public virtual void SetNamespace(string namespace_name)
+    {
+        namespaceName = namespace_name;
+    }
+
+    /// <summary>
     /// コンテンツ名取得
     /// </summary>
     public virtual string GetName()

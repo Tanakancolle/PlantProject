@@ -16,6 +16,9 @@ public class ClassParser : IContentParser
 
         var info = new ClassInfo ();
 
+        // ネームスペース設定
+        info.SetNamespace (namespace_name);
+
         // クラス名設定
         info.SetName (lines [index].Replace ("class", string.Empty).Replace ("{", string.Empty).Replace ("abstract", string.Empty).Trim ());
 
@@ -41,8 +44,6 @@ public class ClassParser : IContentParser
 
             index++;
         }
-
-        index++;
 
         return new ContentInfoBase[] { info };
     }

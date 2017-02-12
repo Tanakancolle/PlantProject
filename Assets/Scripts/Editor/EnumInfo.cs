@@ -6,23 +6,40 @@ using System.Text;
 /// 列挙型情報
 /// </summary>
 public class EnumInfo : ContentInfoBase
-{
-
+{           
     public override StringBuilder BuildScriptText(PlantUMLConvertOption option)
     {
         var builder = new StringBuilder ();
+        var tab = string.Empty;
+        int tab_num = 0;
+
+        // ネームスペース開始チェック
+        if (!string.IsNullOrEmpty (namespaceName)) {
+            builder.AppendLine (string.Format ("namespace {0}", namespaceName));
+            builder.AppendLine ("{");
+            tab_num++;
+        }
 
         // 列挙型定義開始
-        builder.AppendLine (GetDeclarationName ());
-        builder.AppendLine ("{");
+        tab = StringBuilderSupporter.SetTab (tab_num);
+        builder.AppendLine (tab + GetDeclarationName ());
+        builder.AppendLine (tab + "{");
+        tab_num++;
         {
-            var tab = StringBuilderSupporter.SetTab (1);
+            tab = StringBuilderSupporter.SetTab (tab_num);
 
             foreach (var name in GetDeclarationMemberNames ()) {
                 builder.AppendLine (tab + name);
             }
         }
-        builder.AppendLine ("}");
+        tab_num--;
+        tab = StringBuilderSupporter.SetTab (tab_num);
+        builder.AppendLine (tab + "}");
+
+        // ネームスペース終了チェック
+        if (!string.IsNullOrEmpty (namespaceName)) {
+            builder.AppendLine ("}");
+        }
 
         return builder;
     }

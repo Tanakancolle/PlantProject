@@ -16,6 +16,9 @@ public class InterfaceParser : IContentParser
         
         var info = new InterfaceInfo ();
 
+        // ネームスペース設定
+        info.SetNamespace (namespace_name);
+
         // インターフェース名設定
         info.SetName (lines [index].Replace ("interface", string.Empty).Replace ("{", string.Empty).Trim ());
 
@@ -37,9 +40,7 @@ public class InterfaceParser : IContentParser
             }
 
             index++;
-        }
-
-        index++;
+        }                
 
         return new ContentInfoBase[] { info };
     }

@@ -1,5 +1,7 @@
 @startuml
 
+namespace UML {
+
 class PlantUMLConvertWindow {
   +static void CreateWindow()
 }
@@ -49,5 +51,7 @@ IContentParser <|-down- EnumParser
 ContentInfoBase <|-down- ClassInfo
 ContentInfoBase <|-down- InterfaceInfo
 ContentInfoBase <|-down- EnumInfo
+
+}
 
 @enduml
