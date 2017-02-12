@@ -92,15 +92,28 @@ public class PlantUMLConvertWindow : EditorWindow
         }
         EditorGUILayout.EndVertical ();
 
-        // スクリプト生成開始
-        if (GUILayout.Button ("生成開始")) {
-            if( textAsset == null ) {
-                Debug.LogError("クラス図が指定されていません");
-                return;
+        // 変換処理開始
+        EditorGUILayout.BeginHorizontal ();
+        {
+            if (GUILayout.Button ("チェック")) {
+                if (textAsset == null) {
+                    Debug.LogError ("クラス図が指定されていません");
+                    return;
+                }
+
+                var converter = new PlantUMLConverter ();
+                converter.ConvertProcess (textAsset.text, convertOption, true);
             }
 
-            var converter = new PlantUMLConverter ();
-            converter.ConvertProcess (textAsset.text, convertOption);
+            if (GUILayout.Button ("生成開始")) {
+                if (textAsset == null) {
+                    Debug.LogError ("クラス図が指定されていません");
+                    return;
+                }
+
+                var converter = new PlantUMLConverter ();
+                converter.ConvertProcess (textAsset.text, convertOption, false);
+            }             
         }
     }
 

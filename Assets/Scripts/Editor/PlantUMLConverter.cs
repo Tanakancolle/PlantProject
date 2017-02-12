@@ -25,7 +25,7 @@ public class PlantUMLConverter
     /// <summary>
     /// 変換処理
     /// </summary>
-    public void ConvertProcess(string text, PlantUMLConvertOption option)
+    public void ConvertProcess(string text, PlantUMLConvertOption option, bool is_check )
     {
         // １行毎に分割
         var lines = text.Replace ("\r\n", "\n").Split ('\n');
@@ -58,7 +58,7 @@ public class PlantUMLConverter
         ParseExtension (lines, PlantUMLUtility.ReplaceDirPattern (option.arrowExtensionLeftPattern), PlantUMLUtility.ReplaceDirPattern (option.arrowExtensionRightPattern));
 
         // スクリプト生成処理
-        CreateScripts (option);
+        CreateScripts (option, is_check);
     }
 
     /// <summary>
@@ -162,13 +162,19 @@ public class PlantUMLConverter
     /// <summary>
     /// スクリプト群生成
     /// </summary>
-    private void CreateScripts(PlantUMLConvertOption option)
+    private void CreateScripts(PlantUMLConvertOption option, bool is_check)
     {
         var create_path = option.createFolderPath.TrimEnd ('/');
 
         foreach (var info in contentInfoList) {
             // スクリプトテキスト取得
             var builder = info.BuildScriptText (option);
+
+            // チェックのみか
+            if(is_check) {
+                Debug.LogFormat ("----{0}/{1}.cs----\n{2}----end----", create_path, info.GetName (), builder.ToString ());
+                continue;
+            }
 
             // スクリプト生成　※上書きは行わない
             if (StringBuilderSupporter.CreateScript (string.Format ("{0}/{1}.cs", create_path, info.GetName ()), builder.ToString (), false)) {
