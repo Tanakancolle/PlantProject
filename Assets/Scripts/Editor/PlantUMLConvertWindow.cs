@@ -1,197 +1,200 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using UnityEditorInternal;
-using System.Collections.Generic;
 
-/// <summary>
-/// PlantUML変換ウィンドウ
-/// </summary>
-public class PlantUMLConvertWindow : EditorWindow
-{ 
-    /// <summary>
-    /// インスタンス
-    /// </summary>
-    private static PlantUMLConvertWindow umlWindow;
+namespace UML
+{
 
     /// <summary>
-    /// ウィンドウ生成
+    /// PlantUML変換ウィンドウ
     /// </summary>
-    [MenuItem ("UML/ConvertWindow")]
-    static private void CreateWindow()
+    public class PlantUMLConvertWindow : EditorWindow
     {
-        if (umlWindow == null) {
-            umlWindow = CreateInstance<PlantUMLConvertWindow> ();
-        }
+        /// <summary>
+        /// インスタンス
+        /// </summary>
+        private static PlantUMLConvertWindow umlWindow;
 
-        umlWindow.titleContent = new GUIContent ("PlantUMLConverter");
-        umlWindow.ShowUtility ();
-    }
-
-    /// <summary>
-    /// クラス図を受け取るテキストアセット
-    /// </summary>
-    private TextAsset textAsset;
-
-    /// <summary>
-    /// オプション
-    /// </summary>
-    private PlantUMLConvertOption convertOption;
-
-    /// <summary>
-    /// オプション用シリアライズオブジェクト
-    /// </summary>
-    private SerializedObject optionSerializedObject;
-
-    /// <summary>
-    /// usingリスト表示用
-    /// </summary>
-    private ReorderableList usingReorderableList;                 
-
-    private void OnGUI()
-    {
-        // インスタンスチェック
-        CheckInstance ();
-
-        // 対象クラス図
-        EditorGUILayout.BeginHorizontal ();
+        /// <summary>
+        /// ウィンドウ生成
+        /// </summary>
+        [MenuItem ("UML/ConvertWindow")]
+        static private void CreateWindow()
         {
-            EditorGUILayout.LabelField ("対象クラス図", GUILayout.MaxWidth (100));
-            textAsset = EditorGUILayout.ObjectField (textAsset, typeof (TextAsset), false) as TextAsset;
+            if (umlWindow == null) {
+                umlWindow = CreateInstance<PlantUMLConvertWindow> ();
+            }
+
+            umlWindow.titleContent = new GUIContent ("PlantUMLConverter");
+            umlWindow.ShowUtility ();
         }
-        EditorGUILayout.EndHorizontal ();                  
 
-        // オプション
-        EditorGUILayout.BeginVertical (GUI.skin.box);
-        { 
-            EditorGUILayout.LabelField ("オプション");
-            convertOption.createFolderPath = EditorGUILayout.TextField ("生成フォルダ", convertOption.createFolderPath);
-            convertOption.arrowPattern = EditorGUILayout.TextField ("矢印パターン", convertOption.arrowPattern);
-            convertOption.arrowExtensionLeftPattern = EditorGUILayout.TextField ("左継承矢印パターン", convertOption.arrowExtensionLeftPattern);
-            convertOption.arrowExtensionRightPattern = EditorGUILayout.TextField ("右継承矢印パターン", convertOption.arrowExtensionRightPattern);
-            convertOption.isNonCreateNamespace = EditorGUILayout.Toggle ("名前空間の非生成", convertOption.isNonCreateNamespace);
-            convertOption.isNonCreateMember = EditorGUILayout.Toggle ("メンバの非生成", convertOption.isNonCreateMember);
+        /// <summary>
+        /// クラス図を受け取るテキストアセット
+        /// </summary>
+        private TextAsset textAsset;
 
-            // using配列設定
-            optionSerializedObject.Update ();
-            usingReorderableList.DoLayoutList ();
-            optionSerializedObject.ApplyModifiedProperties ();
-            
-            // オプション保存＆読み込み処理
-            EditorGUILayout.BeginHorizontal (GUI.skin.box);
+        /// <summary>
+        /// オプション
+        /// </summary>
+        private PlantUMLConvertOption convertOption;
+
+        /// <summary>
+        /// オプション用シリアライズオブジェクト
+        /// </summary>
+        private SerializedObject optionSerializedObject;
+
+        /// <summary>
+        /// usingリスト表示用
+        /// </summary>
+        private ReorderableList usingReorderableList;
+
+        private void OnGUI()
+        {
+            // インスタンスチェック
+            CheckInstance ();
+
+            // 対象クラス図
+            EditorGUILayout.BeginHorizontal ();
             {
-                if (GUILayout.Button ("オプション保存")) {
-                    var save_path = EditorUtility.SaveFilePanel ("", "Assets", "", "asset");
-                    SaveOption (save_path);
-                }
-
-                if (GUILayout.Button ("オプション読み込み")) {
-                    var load_path = EditorUtility.OpenFilePanel ("", "Assets", "asset");
-                    LoadOption (load_path);
-                }
+                EditorGUILayout.LabelField ("対象クラス図", GUILayout.MaxWidth (100));
+                textAsset = EditorGUILayout.ObjectField (textAsset, typeof (TextAsset), false) as TextAsset;
             }
             EditorGUILayout.EndHorizontal ();
-        }
-        EditorGUILayout.EndVertical ();
 
-        // 変換処理開始
-        EditorGUILayout.BeginHorizontal ();
-        {
-            if (GUILayout.Button ("チェック")) {
-                if (textAsset == null) {
-                    Debug.LogError ("クラス図が指定されていません");
-                    return;
+            // オプション
+            EditorGUILayout.BeginVertical (GUI.skin.box);
+            {
+                EditorGUILayout.LabelField ("オプション");
+                convertOption.createFolderPath = EditorGUILayout.TextField ("生成フォルダ", convertOption.createFolderPath);
+                convertOption.arrowPattern = EditorGUILayout.TextField ("矢印パターン", convertOption.arrowPattern);
+                convertOption.arrowExtensionLeftPattern = EditorGUILayout.TextField ("左継承矢印パターン", convertOption.arrowExtensionLeftPattern);
+                convertOption.arrowExtensionRightPattern = EditorGUILayout.TextField ("右継承矢印パターン", convertOption.arrowExtensionRightPattern);
+                convertOption.isNonCreateNamespace = EditorGUILayout.Toggle ("名前空間の非生成", convertOption.isNonCreateNamespace);
+                convertOption.isNonCreateMember = EditorGUILayout.Toggle ("メンバの非生成", convertOption.isNonCreateMember);
+
+                // using配列設定
+                optionSerializedObject.Update ();
+                usingReorderableList.DoLayoutList ();
+                optionSerializedObject.ApplyModifiedProperties ();
+
+                // オプション保存＆読み込み処理
+                EditorGUILayout.BeginHorizontal (GUI.skin.box);
+                {
+                    if (GUILayout.Button ("オプション保存")) {
+                        var save_path = EditorUtility.SaveFilePanel ("", "Assets", "", "asset");
+                        SaveOption (save_path);
+                    }
+
+                    if (GUILayout.Button ("オプション読み込み")) {
+                        var load_path = EditorUtility.OpenFilePanel ("", "Assets", "asset");
+                        LoadOption (load_path);
+                    }
+                }
+                EditorGUILayout.EndHorizontal ();
+            }
+            EditorGUILayout.EndVertical ();
+
+            // 変換処理開始
+            EditorGUILayout.BeginHorizontal ();
+            {
+                if (GUILayout.Button ("チェック")) {
+                    if (textAsset == null) {
+                        Debug.LogError ("クラス図が指定されていません");
+                        return;
+                    }
+
+                    var converter = new PlantUMLConverter ();
+                    converter.ConvertProcess (textAsset.text, convertOption, true);
                 }
 
-                var converter = new PlantUMLConverter ();
-                converter.ConvertProcess (textAsset.text, convertOption, true);
+                if (GUILayout.Button ("生成開始")) {
+                    if (textAsset == null) {
+                        Debug.LogError ("クラス図が指定されていません");
+                        return;
+                    }
+
+                    var converter = new PlantUMLConverter ();
+                    converter.ConvertProcess (textAsset.text, convertOption, false);
+                }
+            }
+        }
+
+        /// <summary>
+        /// インスタンスをチェック
+        /// </summary>
+        /// <memo>なぜか消えてしまう事があるため毎回チェック</memo>
+        private void CheckInstance()
+        {
+            if (convertOption == null) {
+                convertOption = ScriptableObject.CreateInstance<PlantUMLConvertOption> ();
             }
 
-            if (GUILayout.Button ("生成開始")) {
-                if (textAsset == null) {
-                    Debug.LogError ("クラス図が指定されていません");
-                    return;
-                }
+            if (optionSerializedObject == null) {
+                optionSerializedObject = new SerializedObject (convertOption);
+                SetupDeclarationUsingOption ();
+            }
 
-                var converter = new PlantUMLConverter ();
-                converter.ConvertProcess (textAsset.text, convertOption, false);
-            }             
-        }
-    }
-
-    /// <summary>
-    /// インスタンスをチェック
-    /// </summary>
-    /// <memo>なぜか消えてしまう事があるため毎回チェック</memo>
-    private void CheckInstance()
-    {
-        if (convertOption == null) {
-            convertOption = ScriptableObject.CreateInstance<PlantUMLConvertOption> ();
         }
 
-        if (optionSerializedObject == null) {
+        /// <summary>
+        /// 宣言usingオプションセットアップ
+        /// </summary>
+        private void SetupDeclarationUsingOption()
+        {
+            var property = optionSerializedObject.FindProperty ("declarationUsings");
+
+            var reorderable = new ReorderableList (optionSerializedObject, property);
+            reorderable.drawElementCallback = (rect, index, isActive, isFocused) => {
+                var element = property.GetArrayElementAtIndex (index);
+                rect.height -= 4;
+                rect.y += 2;
+                EditorGUI.PropertyField (rect, element);
+            };
+
+            reorderable.drawHeaderCallback = (rect) => EditorGUI.LabelField (rect, "宣言するusing");
+
+            usingReorderableList = reorderable;
+        }
+
+        /// <summary>
+        /// 設定保存
+        /// </summary>
+        private void SaveOption(string path)
+        {
+            if (string.IsNullOrEmpty (path)) {
+                return;
+            }
+
+            AssetDatabase.CreateAsset (convertOption, path.Substring (path.IndexOf ("Assets")));
+            AssetDatabase.SaveAssets ();
+
+            convertOption = convertOption.Copy ();
+
+            // usignオプション表示準備       
             optionSerializedObject = new SerializedObject (convertOption);
             SetupDeclarationUsingOption ();
         }
 
-    }
+        /// <summary>
+        /// 設定読み込み
+        /// </summary>
+        private void LoadOption(string path)
+        {
+            if (string.IsNullOrEmpty (path)) {
+                return;
+            }
 
-    /// <summary>
-    /// 宣言usingオプションセットアップ
-    /// </summary>
-    private void SetupDeclarationUsingOption()
-    {
-        var property = optionSerializedObject.FindProperty ("declarationUsings");
+            var option = AssetDatabase.LoadAssetAtPath<PlantUMLConvertOption> (path.Substring (path.IndexOf ("Assets")));
+            if (option == null) {
+                return;
+            }
 
-        var reorderable = new ReorderableList (optionSerializedObject, property);
-        reorderable.drawElementCallback = (rect, index, isActive, isFocused) => {
-            var element = property.GetArrayElementAtIndex (index);
-            rect.height -= 4;
-            rect.y += 2;
-            EditorGUI.PropertyField (rect, element);
-        };
+            convertOption = option.Copy ();
 
-        reorderable.drawHeaderCallback = (rect) => EditorGUI.LabelField (rect, "宣言するusing");
-
-        usingReorderableList = reorderable;
-    }
-
-    /// <summary>
-    /// 設定保存
-    /// </summary>
-    private void SaveOption(string path)
-    {
-        if (string.IsNullOrEmpty (path)) {
-            return;
-        }                             
-
-        AssetDatabase.CreateAsset (convertOption, path.Substring (path.IndexOf ("Assets")));
-        AssetDatabase.SaveAssets ();
-
-        convertOption = convertOption.Copy ();
-
-        // usignオプション表示準備       
-        optionSerializedObject = new SerializedObject (convertOption);
-        SetupDeclarationUsingOption ();
-    }
-
-    /// <summary>
-    /// 設定読み込み
-    /// </summary>
-    private void LoadOption(string path)
-    {
-        if (string.IsNullOrEmpty (path)) {
-            return;
+            // usignオプション表示準備         
+            optionSerializedObject = new SerializedObject (convertOption);
+            SetupDeclarationUsingOption ();
         }
-
-        var option = AssetDatabase.LoadAssetAtPath<PlantUMLConvertOption> (path.Substring (path.IndexOf ("Assets")));
-        if (option == null) {
-            return;
-        }
-
-        convertOption = option.Copy ();
-
-        // usignオプション表示準備         
-        optionSerializedObject = new SerializedObject (convertOption);
-        SetupDeclarationUsingOption ();
     }
 }

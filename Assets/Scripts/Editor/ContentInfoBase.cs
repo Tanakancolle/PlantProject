@@ -1,112 +1,114 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-/// <summary>
-/// コンテンツ情報ベース
-/// </summary>
-public abstract class ContentInfoBase
+namespace UML
 {
-    /// <summary>
-    /// コンテンツ名
-    /// </summary>
-    protected string contentName;
 
     /// <summary>
-    /// ネームスペース名
+    /// コンテンツ情報ベース
     /// </summary>
-    protected string namespaceName;
-
-    /// <summary>
-    /// メンバーリスト
-    /// </summary>
-    protected List<MemberInfo> memberList = new List<MemberInfo> ();
-
-    /// <summary>
-    /// 継承リスト
-    /// </summary>
-    protected List<ContentInfoBase> inheritanceList = new List<ContentInfoBase> ();
-
-    /// <summary>
-    /// コンテンツ名設定
-    /// </summary>
-    public virtual void SetName(string name)
+    public abstract class ContentInfoBase
     {
-        contentName = name;
-    }
+        /// <summary>
+        /// コンテンツ名
+        /// </summary>
+        protected string contentName;
 
-    /// <summary>
-    /// ネームスペース設定
-    /// </summary>                           
-    public virtual void SetNamespace(string namespace_name)
-    {
-        namespaceName = namespace_name;
-    }
+        /// <summary>
+        /// ネームスペース名
+        /// </summary>
+        protected string namespaceName;
 
-    /// <summary>
-    /// コンテンツ名取得
-    /// </summary>
-    public virtual string GetName()
-    {
-        return contentName;
-    }
+        /// <summary>
+        /// メンバーリスト
+        /// </summary>
+        protected List<MemberInfo> memberList = new List<MemberInfo> ();
 
-    /// <summary>
-    /// スクリプトテキスト作成
-    /// </summary>
-    public abstract StringBuilder BuildScriptText(PlantUMLConvertOption option);
+        /// <summary>
+        /// 継承リスト
+        /// </summary>
+        protected List<ContentInfoBase> inheritanceList = new List<ContentInfoBase> ();
 
-    /// <summary>
-    /// 宣言するメンバ名取得
-    /// </summary>
-    protected virtual List<MemberInfo> GetDeclarationMemberInfos()
-    {
-        var list = new List<MemberInfo> ();
-        foreach (var info in inheritanceList) {
-            list.AddRange (info.GetAbstractMemberInfos ());
+        /// <summary>
+        /// コンテンツ名設定
+        /// </summary>
+        public virtual void SetName(string name)
+        {
+            contentName = name;
         }
 
-        list.AddRange (memberList);
-
-        return list;
-    }
-
-    /// <summary>
-    /// 抽象メンバー名取得
-    /// </summary>
-    public virtual MemberInfo[] GetAbstractMemberInfos()
-    {
-        if (memberList == null) {
-            return null;
+        /// <summary>
+        /// ネームスペース設定
+        /// </summary>                           
+        public virtual void SetNamespace(string namespace_name)
+        {
+            namespaceName = namespace_name;
         }
 
-        return memberList.Where (member => member.isAbstract).ToArray ();
+        /// <summary>
+        /// コンテンツ名取得
+        /// </summary>
+        public virtual string GetName()
+        {
+            return contentName;
+        }
+
+        /// <summary>
+        /// スクリプトテキスト作成
+        /// </summary>
+        public abstract StringBuilder BuildScriptText(PlantUMLConvertOption option);
+
+        /// <summary>
+        /// 宣言するメンバ名取得
+        /// </summary>
+        protected virtual List<MemberInfo> GetDeclarationMemberInfos()
+        {
+            var list = new List<MemberInfo> ();
+            foreach (var info in inheritanceList) {
+                list.AddRange (info.GetAbstractMemberInfos ());
+            }
+
+            list.AddRange (memberList);
+
+            return list;
+        }
+
+        /// <summary>
+        /// 抽象メンバー名取得
+        /// </summary>
+        public virtual MemberInfo[] GetAbstractMemberInfos()
+        {
+            if (memberList == null) {
+                return null;
+            }
+
+            return memberList.Where (member => member.isAbstract).ToArray ();
+        }
+
+        /// <summary>
+        /// メンバ情報追加
+        /// </summary>
+        public virtual void AddMemberInfo(MemberInfo info)
+        {
+            memberList.Add (info);
+        }
+
+        /// <summary>
+        /// 継承情報追加
+        /// </summary>
+        public virtual void AddInhritanceInfo(ContentInfoBase info)
+        {
+            inheritanceList.Add (info);
+        }
     }
 
     /// <summary>
-    /// メンバ情報追加
+    /// メンバー情報
     /// </summary>
-    public virtual void AddMemberInfo(MemberInfo info)
+    public class MemberInfo
     {
-        memberList.Add (info);
+        public string name;
+        public bool isAbstract;
     }
-
-    /// <summary>
-    /// 継承情報追加
-    /// </summary>
-    public virtual void AddInhritanceInfo(ContentInfoBase info)
-    {
-        inheritanceList.Add (info);
-    }
-}
-
-/// <summary>
-/// メンバー情報
-/// </summary>
-public class MemberInfo
-{
-    public string name;
-    public bool isAbstract;
 }
