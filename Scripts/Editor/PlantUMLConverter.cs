@@ -11,7 +11,8 @@ namespace UML
     /// PlantUMLコンバーター
     /// </summary>
     public class PlantUMLConverter
-    {
+    {              
+
         /// <summary>
         /// コンテンツ情報リスト
         /// </summary>
@@ -21,10 +22,10 @@ namespace UML
         /// パーサー配列
         /// </summary>
         private IContentParser[] parsers = new IContentParser[] {
-        new ClassParser (),
-        new InterfaceParser (),
-        new EnumParser(),
-    };
+            new ClassParser (),
+            new InterfaceParser (),
+            new EnumParser(),
+        };
 
         /// <summary>
         /// ネームスペース処理中に行うデリゲート
@@ -89,7 +90,7 @@ namespace UML
                 var parse_name = ParseNamespace (lines, ref i);
                 if (!string.IsNullOrEmpty (parse_name)) {
                     namespace_stack.Push (parse_name);
-                    namespace_name = BuildNamespace (namespace_stack);
+                    namespace_name = BuildNamespaceText (namespace_stack);
                     continue;
                 }
 
@@ -111,7 +112,7 @@ namespace UML
                         scope_count--;
                     } else {
                         namespace_stack.Pop ();
-                        namespace_name = BuildNamespace (namespace_stack);
+                        namespace_name = BuildNamespaceText (namespace_stack);
                     }
 
                     continue;
@@ -141,8 +142,8 @@ namespace UML
 
         /// <summary>
         /// ネームスペース名ビルド
-        /// </summary>              
-        private string BuildNamespace(Stack<string> namespace_stack)
+        /// </summary>
+        private string BuildNamespaceText(Stack<string> namespace_stack)
         {
             var builder = new StringBuilder ();
             for (int i = namespace_stack.Count - 1; i >= 0; --i) {
@@ -158,9 +159,7 @@ namespace UML
 
         /// <summary>
         /// ネームスペースとコンテンツ名に分割
-        /// </summary>
-        /// <param name="line"></param>
-        /// <returns></returns>
+        /// </summary>                  
         private string[] SplitNamespaceAndContentName(string name)
         {
             var splits = new string[2];
@@ -186,17 +185,17 @@ namespace UML
         private bool ParseContents(string[] lines, ref int index, string namespace_name)
         {
             ContentInfoBase[] infos = null;
+
+            // パーサー毎にチェック
             foreach (var parser in parsers) {
                 infos = parser.Parse (lines, ref index, namespace_name);
-                if (infos != null) {
-                    break;
-                }
-            }
 
-            if (infos != null) {
-                contentInfoList.AddRange (infos);
-                return true;
-            }
+                // パースされたら終了
+                if (infos != null) {
+                    contentInfoList.AddRange (infos);
+                    return true;
+                }
+            }                   
 
             return false;
         }
@@ -211,10 +210,12 @@ namespace UML
                 return;
             }
 
-            // クラス名取り出し
-            var struct_names = arrowRegex.Split (lines[index]);
-            foreach (var struct_name in struct_names) {
-                var splits = SplitNamespaceAndContentName (struct_name.Trim ());
+
+            // クラス名取り出し                                                                                 
+            var struct_names = arrowRegex.Split (lines[index]).Select (x => RemoveNotIncludedInContentName (x));
+            foreach (var struct_name in struct_names) {               
+                // ネームスペースと分割
+                var splits = SplitNamespaceAndContentName (struct_name);
 
                 // すでに登録されているか
                 if (contentInfoList.Any (x => x.GetName () == splits[1])) {
@@ -229,7 +230,7 @@ namespace UML
                 // クラス登録
                 contentInfoList.Add (info);
             }
-        }
+        }          
 
         /// <summary>
         /// 継承パース
@@ -256,8 +257,9 @@ namespace UML
             // 矢印チェック
             for (int i = 0; i < lines.Length; ++i) {
                 if (left_regex != null && left_regex.IsMatch (lines[i])) {
-                    var contents = left_regex.Split (lines[i]).Select (x => x.Trim ()).ToArray ();
-
+                    // 一致文字列からコンテンツ名取り出し
+                    var contents = left_regex.Split (lines[i]).Select (x => RemoveNotIncludedInContentName (x)).ToArray(); 
+                    
                     var base_splits = SplitNamespaceAndContentName (contents[0]);
                     var target_splits = SplitNamespaceAndContentName (contents[1]);
 
@@ -267,7 +269,8 @@ namespace UML
                     // 継承情報追加
                     target_content.AddInhritanceInfo (base_content);
                 } else if (right_regex != null && right_regex.IsMatch (lines[i])) {
-                    var contents = right_regex.Split (lines[i]).Select (x => x.Trim ()).ToArray ();
+                    // 一致文字列からコンテンツ名取り出し                     
+                    var contents = right_regex.Split (lines[i]).Select (x => RemoveNotIncludedInContentName (x)).ToArray ();
 
                     var base_splits = SplitNamespaceAndContentName (contents[1]);
                     var target_splits = SplitNamespaceAndContentName (contents[0]);
@@ -279,6 +282,23 @@ namespace UML
                     target_content.AddInhritanceInfo (base_content);
                 }
             }
+        }
+
+
+        /// <summary>
+        /// コンテンツ名の不要文字削除
+        /// </summary>                 
+        private string RemoveNotIncludedInContentName(string line)
+        {                       
+            line = Regex.Replace (line, "\".*\"", string.Empty).Replace (" ", string.Empty);       
+
+            var index = line.IndexOf (":");
+
+            if (index < 0) {
+                return line;
+            }
+
+            return line.Substring (0, index);
         }
 
         /// <summary>
