@@ -12,6 +12,12 @@ namespace UML
     /// </summary>
     public class PlantUMLConverter
     {              
+        public class LineInfo
+        {
+            public string line;
+
+            public string namespaceName;
+        }
 
         /// <summary>
         /// コンテンツ情報リスト
@@ -25,28 +31,37 @@ namespace UML
             new ClassParser (),
             new InterfaceParser (),
             new EnumParser(),
-        };
-
-        /// <summary>
-        /// ネームスペース処理中に行うデリゲート
-        /// </summary>
-        /// <param name="lines">文字配列</param>
-        /// <param name="index">現在のインデックス</param>
-        /// <param name="namespace_name">ネームスペース名</param>
-        private delegate bool NamespaceCenterAction(string[] lines, ref int index, string namespace_name);
-
-        /// <summary>
-        /// ネームスペース処理中に行うデリゲート
-        /// </summary>
-        /// <param name="lines">文字配列</param>
-        /// <param name="index">現在のインデックス</param>
-        /// <param name="namespace_name">ネームスペース名</param>
-        private delegate void NamespaceAfterAction(string[] lines, ref int index, string namespace_name);
+        };                                                                                             
 
         /// <summary>
         /// 矢印用正規表現
         /// </summary>
         private Regex arrowRegex;
+
+        /// <summary>
+        /// 左継承矢印用正規表現
+        /// </summary>
+        private Regex arrowExtensionLeftRegex;
+
+        /// <summary>
+        /// 右継承矢印用正規表現
+        /// </summary>
+        private Regex arrowExtensionRightRegex;
+
+        /// <summary>
+        /// 矢印用ライン情報リスト
+        /// </summary>
+        private List<LineInfo> arrowLineInfoList;
+
+        /// <summary>
+        /// 左継承矢印用ライン情報リスト
+        /// </summary>
+        private List<LineInfo> arrowExtensionLeftLineInfoList;
+
+        /// <summary>
+        /// 右継承矢印用ライン情報リスト
+        /// </summary>
+        private List<LineInfo> arrowExtensionRightLineInfoList;
 
         /// <summary>
         /// 変換処理
@@ -56,29 +71,43 @@ namespace UML
             // １行毎に分割
             var lines = text.Replace ("\r\n", "\n").Split ('\n');
 
-            // コンテンツパース処理
-            ParseNamespaceProcess (lines, ParseContents, null);
+            // 矢印系の初期化 
+            {
+                if (!string.IsNullOrEmpty (option.arrowPattern)) {
+                    arrowLineInfoList = new List<LineInfo> ();
+                    arrowRegex = new Regex (PlantUMLUtility.ReplaceDirPattern (option.arrowPattern));
+                }
 
-            // 矢印パース処理
-            if (!string.IsNullOrEmpty (option.arrowPattern)) {
-                arrowRegex = new Regex (PlantUMLUtility.ReplaceDirPattern (option.arrowPattern));
-                ParseNamespaceProcess (lines, null, ParseArrow);
+                if (!string.IsNullOrEmpty (option.arrowExtensionLeftPattern)) {
+                    arrowExtensionLeftLineInfoList = new List<LineInfo> ();
+                    arrowExtensionLeftRegex = new Regex (PlantUMLUtility.ReplaceDirPattern (option.arrowExtensionLeftPattern));
+                }
+
+                if (!string.IsNullOrEmpty (option.arrowExtensionRightPattern)) {
+                    arrowExtensionRightLineInfoList = new List<LineInfo> ();
+                    arrowExtensionRightRegex = new Regex (PlantUMLUtility.ReplaceDirPattern (option.arrowExtensionRightPattern));
+                }
             }
 
-            // 継承パース処理
-            ParseExtensionProcess (lines, PlantUMLUtility.ReplaceDirPattern (option.arrowExtensionLeftPattern), PlantUMLUtility.ReplaceDirPattern (option.arrowExtensionRightPattern));
+            // パース処理
+            ParseProcess (lines);
+
+            // 矢印系のパース 
+            {
+                ParseArrow ();
+                ParseArrowExtensionLeft ();
+                ParseArrowExtensionRight ();
+            }                                                                                                                                                           
 
             // スクリプト生成処理
             CreateScripts (option, is_check);
         }
 
         /// <summary>
-        /// ネームスペースパース処理
+        /// パース処理
         /// </summary>
-        /// <param name="lines">チェック文字配列</param>
-        /// <param name="center_action">開始チェックと終了チェックの間で行う処理</param>
-        /// <param name="after_action">終了チェック後に行う処理</param>
-        private void ParseNamespaceProcess(string[] lines, NamespaceCenterAction center_action, NamespaceAfterAction after_action)
+        /// <param name="lines">チェック文字配列</param>                             
+        private void ParseProcess(string[] lines)
         {
             // ネームスペース関連
             var namespace_stack = new Stack<string> ();
@@ -94,11 +123,9 @@ namespace UML
                     continue;
                 }
 
-                // 中央処理チェック
-                if (center_action != null) {
-                    if (center_action.Invoke (lines, ref i, namespace_name)) {
-                        continue;
-                    }
+                // コンテンツパース
+                if( ParseContents (lines, ref i, namespace_name) ) {
+                    continue;
                 }
 
                 // 管理外のスコープチェック
@@ -118,9 +145,11 @@ namespace UML
                     continue;
                 }
 
-                // アフター処理チェック
-                if (after_action != null) {
-                    after_action.Invoke (lines, ref i, namespace_name);
+                // 矢印チェック
+                {
+                    CheckArrowLineAndAddList (lines[i], namespace_name);
+                    CheckArrowExtensionLeftLineAndAddList (lines[i], namespace_name);
+                    CheckArrowExtensionRightLineAndAddList (lines[i], namespace_name);
                 }
             }
         }
@@ -201,89 +230,135 @@ namespace UML
         }
 
         /// <summary>
-        /// 矢印パース
-        /// </summary>
-        private void ParseArrow(string[] lines, ref int index, string namespace_name)
+        /// 矢印行かチェックしてリストに追加
+        /// </summary>                              
+        private void CheckArrowLineAndAddList( string line, string namespace_name)
         {
             // 矢印チェック
-            if (!arrowRegex.IsMatch (lines[index])) {
+            if (arrowRegex == null || !arrowRegex.IsMatch (line)) {
                 return;
             }
 
+            var info = new LineInfo ();
+            info.line = line;
+            info.namespaceName = namespace_name;
 
-            // クラス名取り出し                                                                                 
-            var struct_names = arrowRegex.Split (lines[index]).Select (x => RemoveNotIncludedInContentName (x));
-            foreach (var struct_name in struct_names) {               
-                // ネームスペースと分割
-                var splits = SplitNamespaceAndContentName (struct_name);
-
-                // すでに登録されているか
-                if (contentInfoList.Any (x => x.GetName () == splits[1])) {
-                    continue;
-                }
-
-                // 新コンテンツはクラスとする
-                var info = new ClassInfo ();
-                info.SetNamespace (splits[0] == string.Empty ? namespace_name : splits[0]);
-                info.SetName (splits[1]);
-
-                // クラス登録
-                contentInfoList.Add (info);
-            }
-        }          
-
-        /// <summary>
-        /// 継承パース
-        /// </summary>
-        private void ParseExtensionProcess(string[] lines, string left_pattern, string right_pattern)
-        {
-            // 継承矢印パターン
-            Regex left_regex = null;
-            Regex right_regex = null;
-
-            if (!string.IsNullOrEmpty (left_pattern)) {
-                left_regex = new Regex (left_pattern);
-            }
-
-            if (!string.IsNullOrEmpty (right_pattern)) {
-                right_regex = new Regex (right_pattern);
-            }
-
-            // 両方共パターンが空だったら終了
-            if (left_regex == null && right_regex == null) {
-                return;
-            }
-
-            // 矢印チェック
-            for (int i = 0; i < lines.Length; ++i) {
-                if (left_regex != null && left_regex.IsMatch (lines[i])) {
-                    // 一致文字列からコンテンツ名取り出し
-                    var contents = left_regex.Split (lines[i]).Select (x => RemoveNotIncludedInContentName (x)).ToArray(); 
-                    
-                    var base_splits = SplitNamespaceAndContentName (contents[0]);
-                    var target_splits = SplitNamespaceAndContentName (contents[1]);
-
-                    var base_content = contentInfoList.FirstOrDefault (x => x.GetName () == base_splits[1]);
-                    var target_content = contentInfoList.FirstOrDefault (x => x.GetName () == target_splits[1]);
-
-                    // 継承情報追加
-                    target_content.AddInhritanceInfo (base_content);
-                } else if (right_regex != null && right_regex.IsMatch (lines[i])) {
-                    // 一致文字列からコンテンツ名取り出し                     
-                    var contents = right_regex.Split (lines[i]).Select (x => RemoveNotIncludedInContentName (x)).ToArray ();
-
-                    var base_splits = SplitNamespaceAndContentName (contents[1]);
-                    var target_splits = SplitNamespaceAndContentName (contents[0]);
-
-                    var base_content = contentInfoList.FirstOrDefault (x => x.GetName () == base_splits[1]);
-                    var target_content = contentInfoList.FirstOrDefault (x => x.GetName () == target_splits[1]);
-
-                    // 継承情報追加
-                    target_content.AddInhritanceInfo (base_content);
-                }
-            }
+            arrowLineInfoList.Add (info);
         }
 
+        /// <summary>
+        /// 左継承矢印行かチェックしてリストに追加
+        /// </summary>                            
+        private void CheckArrowExtensionLeftLineAndAddList( string line, string namespace_name)
+        {
+            // 矢印チェック
+            if (arrowExtensionLeftRegex == null || !arrowExtensionLeftRegex.IsMatch (line)) {
+                return;
+            }
+
+            var info = new LineInfo ();
+            info.line = line;
+            info.namespaceName = namespace_name;
+
+            arrowExtensionLeftLineInfoList.Add (info);
+        }
+
+        /// <summary>
+        /// 右継承矢印行かチェックしてリストに追加
+        /// </summary>                            
+        private void CheckArrowExtensionRightLineAndAddList(string line, string namespace_name)
+        {
+            // 矢印チェック
+            if (arrowExtensionRightRegex == null || !arrowExtensionRightRegex.IsMatch (line)) {
+                return;
+            }
+
+            var info = new LineInfo ();
+            info.line = line;
+            info.namespaceName = namespace_name;
+
+            arrowExtensionRightLineInfoList.Add (info);
+        }
+
+        /// <summary>
+        /// 矢印パース
+        /// </summary>
+        private void ParseArrow()
+        {   
+            if( arrowLineInfoList == null) {
+                return;
+            }                
+
+            foreach(var line_info in arrowLineInfoList) {       
+                // クラス名取り出し                                                                                 
+                var struct_names = arrowRegex.Split (line_info.line).Select (x => RemoveNotIncludedInContentName (x));
+                foreach (var struct_name in struct_names) {
+                    // ネームスペースと分割 ※「.」のパターン
+                    var splits = SplitNamespaceAndContentName (struct_name);
+
+                    // すでに登録されているか
+                    if (contentInfoList.Any (x => x.GetName () == splits[1])) {
+                        continue;
+                    }
+
+                    // 新コンテンツはクラスとする
+                    var info = new ClassInfo ();
+                    info.SetNamespace (splits[0] == string.Empty ? line_info.namespaceName : splits[0]);
+                    info.SetName (splits[1]);
+
+                    // クラス登録
+                    contentInfoList.Add (info);
+                }
+
+            }
+        }      
+        
+        /// <summary>
+        /// 左継承矢印のパース
+        /// </summary>
+        private void ParseArrowExtensionLeft()
+        {
+            if(arrowExtensionLeftLineInfoList == null) {
+                return;
+            }
+
+            foreach( var info in arrowExtensionLeftLineInfoList) {              
+                var contents = arrowExtensionLeftRegex.Split (info.line).Select (x => RemoveNotIncludedInContentName (x)).ToArray ();
+
+                var base_splits = SplitNamespaceAndContentName (contents[0]);
+                var target_splits = SplitNamespaceAndContentName (contents[1]);
+
+                var base_content = contentInfoList.FirstOrDefault (x => x.GetName () == base_splits[1]);
+                var target_content = contentInfoList.FirstOrDefault (x => x.GetName () == target_splits[1]);
+
+                // 継承情報追加
+                target_content.AddInhritanceInfo (base_content);        
+            }
+        }    
+
+        /// <summary>
+        /// 右継承矢印のパース
+        /// </summary>
+        private void ParseArrowExtensionRight()
+        {
+            if(arrowExtensionRightLineInfoList == null) {
+                return;
+            }
+
+            foreach( var info in arrowExtensionRightLineInfoList) { 
+                var contents = arrowExtensionRightRegex.Split (info.line).Select (x => RemoveNotIncludedInContentName (x)).ToArray ();
+
+                var base_splits = SplitNamespaceAndContentName (contents[1]);
+                var target_splits = SplitNamespaceAndContentName (contents[0]);
+
+                var base_content = contentInfoList.FirstOrDefault (x => x.GetName () == base_splits[1]);
+                var target_content = contentInfoList.FirstOrDefault (x => x.GetName () == target_splits[1]);
+
+                // 継承情報追加
+                target_content.AddInhritanceInfo (base_content);
+
+            }
+        }                                    
 
         /// <summary>
         /// コンテンツ名の不要文字削除
