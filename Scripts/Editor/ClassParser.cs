@@ -11,27 +11,29 @@ namespace UML
         {
             var words = PlantUMLUtility.SplitSpace (lines[index]);
 
-            // クラスチェック
-            if (!PlantUMLUtility.CheckContainsWords (words, "class")) {
+            // コンテンツ名インデックス取得
+            int name_index = PlantUMLUtility.GetContentNameIndexFromWords (words, "class");     
+            if( name_index == -1) {
                 return null;
             }
 
             var info = new ClassInfo ();
 
+            // コンテンツ名設定
+            info.SetName (words[name_index].Replace ("{", string.Empty));
+
             // ネームスペース設定
             info.SetNamespace (namespace_name);
 
-            // クラス名設定
-            info.SetName (lines[index].Replace ("class", string.Empty).Replace ("{", string.Empty).Replace ("abstract", string.Empty).Trim ());
-
             // 抽象クラスフラグ設定
-            info.isAbstract = PlantUMLUtility.CheckContainsWords (PlantUMLUtility.SplitSpace (lines[index]), "abstract");
+            info.isAbstract = PlantUMLUtility.CheckContainsWords (words, "abstract");
 
-            // 内容までインデックスをずらす
+            // 内容チェック
+            if (lines[index].IndexOf ("{") < 0) {
+                return new ContentInfoBase[] { info };
+            }                                         
+
             index++;
-            if (lines[index].IndexOf ("{") >= 0) {
-                index++;
-            }
 
             // 定義終了まで内容をパース
             while (lines[index].IndexOf ("}") < 0) {

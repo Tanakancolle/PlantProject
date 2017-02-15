@@ -8,24 +8,26 @@ namespace UML
         {
             var words = PlantUMLUtility.SplitSpace (lines[index]);
 
-            // 列挙型チェック
-            if (!PlantUMLUtility.CheckContainsWords (words, "enum")) {
+            // コンテンツ名インデックス取得
+            int name_index = PlantUMLUtility.GetContentNameIndexFromWords (words, "enum");
+            if (name_index == -1) {
                 return null;
             }
 
             var info = new EnumInfo ();
 
+            // コンテンツ名設定
+            info.SetName (words[name_index].Replace ("{", string.Empty));
+
             // ネームスペース設定
             info.SetNamespace (namespace_name);
 
-            // 名前設定
-            info.SetName (lines[index].Replace ("enum", string.Empty).Replace ("{", string.Empty).Trim ());
-
-            // 内容までインデックスをずらす
-            index++;
-            if (lines[index].IndexOf ("{") >= 0) {
-                index++;
+            // 内容チェック
+            if (lines[index].IndexOf ("{") < 0) {
+                return new ContentInfoBase[] { info };
             }
+
+            index++;                            
 
             // 定義終了まで内容をパース
             while (lines[index].IndexOf ("}") < 0) {
