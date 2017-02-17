@@ -61,7 +61,7 @@ namespace UML
         /// 同ワードチェック
         /// </summary>
         /// <param name="words">ワード配列</param>
-        /// <param name="check_word">チェックワード</param>   
+        /// <param name="check_word">チェックワード</param>
         /// <returns><c>true</c>, ワード有り, <c>false</c> ワード無し.</returns>
         public static bool CheckContainsWords(string[] words, string check_word)
         {
@@ -81,13 +81,13 @@ namespace UML
         /// <param name="check_word">チェックワード</param>
         /// <returns>ワードのインデックス</returns>
         public static int IndexOfWords(string[] words, string check_word)
-        {             
+        {
             for( int i = 0; i < words.Length; ++i) {
                 if(words[i].Equals (check_word)) {
-                    return i; 
+                    return i;
                 }
             }
-                          
+
             return -1;
         }
 
@@ -109,7 +109,7 @@ namespace UML
             int as_index = PlantUMLUtility.IndexOfWords (words, "as");
             if (as_index >= 0) {
                 content_index = as_index;
-            }                                
+            }
 
             for (int i = content_index + 1; i < words.Length; ++i) {
                 if (!string.IsNullOrEmpty (words[i])) {
@@ -122,5 +122,27 @@ namespace UML
 
             return -1;
         }
+
+        /// <summary>
+        /// タイプ名からタイプを取得
+        /// </summary>
+        public static Type GetTypeFromTypeName(string type_name) {
+            int index = type_name.IndexOf ("<");
+            if (index >= 0) {
+                type_name = type_name.Remove (index) + "`1";
+                Debug.Log (type_name);
+            }
+
+            foreach( var assembly in AppDomain.CurrentDomain.GetAssemblies ()){
+                foreach (var type in assembly.GetTypes()) {
+                    if (type.Name.Equals (type_name)) {
+                        return type;
+                    }
+                }
+            }
+
+            return null;
+        }
+
     }
 }
