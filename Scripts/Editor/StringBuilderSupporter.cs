@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using UnityEditor;
 using System.Text;
+using System;
 
 /// <summary>
 /// ビルダー補助クラス
@@ -41,12 +42,36 @@ public class StringBuilderSupporter
         }
 
         foreach (var edit_using in usings) {
-            if (string.IsNullOrEmpty (edit_using)) {
-                continue;
-            }
-
-            builder.AppendLine (string.Format ("using {0};", edit_using));
+            EditUsing (builder, edit_using);
         }
+    }
+
+    /// <summary>
+    /// using定義
+    /// </summary>
+    /// <param name="builder">ストリングビルダー</param>
+    /// <param name="type">タイプ</param>
+    public static void EditUsing(StringBuilder builder, Type type)
+    {
+        if (type == null) {
+            return;
+        }
+
+        EditUsing (builder, type.Namespace);
+    }
+
+    /// <summary>
+    /// using定義
+    /// </summary>
+    /// <param name="builder">ストリングビルダー</param>
+    /// <param name="usings">ネームスペース名</param>
+    public static void EditUsing(StringBuilder builder, string edit_using)
+    {
+        if (string.IsNullOrEmpty (edit_using)) {
+            return;
+        }              
+
+        builder.Insert (0, string.Format ("using {0};\n", edit_using));
     }
 
     /// <summary>

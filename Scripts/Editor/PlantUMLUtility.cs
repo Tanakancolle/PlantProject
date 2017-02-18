@@ -19,10 +19,26 @@ namespace UML
         /// アクセス修飾子テーブル
         /// </summary>
         private static readonly Dictionary<string, string> accessModifiersTable = new Dictionary<string, string> () {
-        {"+", "public "},
-        {"-", "private " },
-        {"#", "protected " }
-    };
+            {"+", "public "},
+            {"-", "private " },
+            {"#", "protected " }
+        };
+
+        /// <summary>
+        /// 非型名
+        /// </summary>
+        private static readonly string[] nonTypeNames = new string[] {
+            "public", "private", "protected",
+            "virtual", "abstract", "override",
+            "static", "readonly", "const"
+        };
+
+        /// <summary>
+        /// 非引数型名
+        /// </summary>
+        private static readonly string[] nonArgumentTypeName = new string[] {
+            "ref", "out"
+        };
 
         /// <summary>
         /// 方向パターン置き換え
@@ -83,8 +99,8 @@ namespace UML
         /// <returns>ワードのインデックス</returns>
         public static int IndexOfWords(string[] words, string check_word)
         {
-            for( int i = 0; i < words.Length; ++i) {
-                if(words[i].Equals (check_word)) {
+            for (int i = 0; i < words.Length; ++i) {
+                if (words[i].Equals (check_word)) {
                     return i;
                 }
             }
@@ -125,13 +141,80 @@ namespace UML
         }
 
         /// <summary>
+        /// 宣言名からタイプ名取得
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static IEnumerable<string> GetTypeNameFromDeclarationName(string name)
+        {
+            var words = PlantUMLUtility.SplitSpace (name);
+
+            // 変数の宣言　＆　関数の返り値対応
+            foreach (var word in words) {
+                if (string.IsNullOrEmpty (word) || PlantUMLUtility.CheckContainsWords (PlantUMLUtility.nonTypeNames, word)) {
+                    continue;
+                }
+
+                yield return word;               
+
+                break;
+            }
+
+            // 関数の引数
+            foreach (var type_name in GetTypeNameInRange ('(', ')', name)) {
+                yield return type_name;
+            }
+
+            // ジェネリック対応
+            foreach (var type_name in GetTypeNameInRange ('<', '>', name)) {
+                yield return type_name;
+            }
+        }
+
+        /// <summary>
+        /// 範囲内のタイプ名取得
+        /// </summary>                         
+        private static IEnumerable<string> GetTypeNameInRange(char start, char end, string text)
+        {
+            int index = 0;
+            while (true) {
+                var start_index = text.IndexOf (start, index);
+                if (start_index == -1) {
+                    yield break;
+                }
+
+                var end_index = text.IndexOf (end, index);
+                if (end_index == -1) {
+                    yield break;
+                }
+
+                index = end_index;
+
+                // 範囲取得
+                start_index++;
+                var argument_texts = text.Substring (start_index, end_index - start_index);
+
+                // タイプ名取得
+                foreach (var argument_text in argument_texts.Split (',')) {
+                    foreach (var argument in PlantUMLUtility.SplitSpace (argument_text)) {
+                        if (string.IsNullOrEmpty (argument) || PlantUMLUtility.CheckContainsWords (PlantUMLUtility.nonArgumentTypeName, argument)) {
+                            continue;
+                        }
+
+                        yield return argument;
+                        break;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// タイプ名からタイプを取得
         /// </summary>
         public static Type GetTypeFromTypeName(string type_name) {
             int index = type_name.IndexOf ("<");
             if (index >= 0) {
                 type_name = type_name.Remove (index) + "`1";
-                Debug.Log (type_name);
             }
 
             foreach( var assembly in AppDomain.CurrentDomain.GetAssemblies ()){

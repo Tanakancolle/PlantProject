@@ -20,9 +20,7 @@ namespace UML
         public override StringBuilder BuildScriptText(PlantUMLConvertOption option)
         {
             var builder = new StringBuilder ();
-
-            // using宣言
-            StringBuilderSupporter.EditUsings (builder, option.declarationUsings);
+            var using_list = new HashSet<string> ();
 
             // 改行
             builder.AppendLine ();
@@ -54,6 +52,16 @@ namespace UML
 
                         // 改行
                         builder.AppendLine ();
+
+                        // usingリスト追加
+                        foreach (var type_name in PlantUMLUtility.GetTypeNameFromDeclarationName (name)) {
+                            var type = PlantUMLUtility.GetTypeFromTypeName (type_name);
+                            if (type == null || string.IsNullOrEmpty (type.Namespace)) {
+                                continue;
+                            }
+
+                            using_list.Add (type.Namespace);
+                        }
                     }
 
                     // 関数宣言
@@ -63,6 +71,16 @@ namespace UML
 
                         // 改行
                         builder.AppendLine ();
+
+                        // usingリスト追加
+                        foreach (var type_name in PlantUMLUtility.GetTypeNameFromDeclarationName (name)) {
+                            var type = PlantUMLUtility.GetTypeFromTypeName (type_name);
+                            if (type == null || string.IsNullOrEmpty (type.Namespace)) {
+                                continue;
+                            }
+
+                            using_list.Add (type.Namespace);
+                        }
                     }
                 }
             }
@@ -74,6 +92,15 @@ namespace UML
             if (!option.isNonCreateNamespace && !string.IsNullOrEmpty (namespaceName)) {
                 builder.AppendLine ("}");
             }
+
+
+            if (option.declarationUsings != null) {
+                foreach (var using_name in option.declarationUsings) {
+                    using_list.Add (using_name);
+                }
+            }
+
+            StringBuilderSupporter.EditUsings (builder, using_list.ToArray ());
 
             return builder;
         }
