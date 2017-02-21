@@ -33,15 +33,18 @@ namespace UML
             index++;
 
             // 定義終了まで内容をパース
-            while (lines[index].IndexOf ("}") < 0) {
+            while (lines[index].IndexOf ("}") < 0) {          
+                if (string.IsNullOrEmpty (lines[index].Trim())) {
+                    index++;
+                    continue;
+                }
+
                 var member = new MemberInfo ();
 
                 member.name = string.Format ("public {0}", lines[index].TrimStart ());
                 member.isAbstract = true;
 
-                if (!string.IsNullOrEmpty (member.name)) {
-                    info.AddMemberInfo (member);
-                }
+                info.AddMemberInfo (member);    
 
                 index++;
             }
