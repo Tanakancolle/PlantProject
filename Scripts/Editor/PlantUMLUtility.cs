@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Reflection;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace UML
 {
@@ -39,6 +42,20 @@ namespace UML
         private static readonly string[] nonArgumentTypeName = new string[] {
             "ref", "out"
         };
+
+        /// <summary>
+        /// 非検索アセンブリ名
+        /// </summary>
+        private static readonly string[] nonFindAssemblyName = new string[] {
+            "SyntaxTree.*",
+            "Mono.Cecil",
+            "Boo.Lang"
+        };
+
+        /// <summary>
+        /// アセンブリリスト
+        /// </summary>
+        private static List<Assembly> assemblyList;
 
         /// <summary>
         /// 方向パターン置き換え
@@ -212,12 +229,20 @@ namespace UML
         /// タイプ名からタイプを取得
         /// </summary>
         public static Type GetTypeFromTypeName(string type_name) {
+            // 検索アセンブリ取得
+            if(assemblyList == null) {
+                assemblyList = new List<Assembly> ();
+                assemblyList.AddRange (AppDomain.CurrentDomain.GetAssemblies ().Where (x => !nonFindAssemblyName.Any (n => Regex.IsMatch (x.GetName ().Name, n))));
+            }
+
+            // ジェネリック対応処理
             int index = type_name.IndexOf ("<");
             if (index >= 0) {
                 type_name = type_name.Remove (index) + "`1";
             }
 
-            foreach( var assembly in AppDomain.CurrentDomain.GetAssemblies ()){
+            // タイプ検索
+            foreach( var assembly in assemblyList){
                 foreach (var type in assembly.GetTypes()) {
                     if (type.Name.Equals (type_name)) {
                         return type;
