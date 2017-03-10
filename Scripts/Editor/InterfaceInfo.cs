@@ -13,7 +13,7 @@ namespace UML
         public override StringBuilder BuildScriptText(PlantUMLConvertOption option)
         {
             var builder = new StringBuilder ();
-            var using_list = new HashSet<string> ();                               
+            var using_list = new HashSet<string> ();
 
             // 改行
             builder.AppendLine ();
@@ -28,15 +28,15 @@ namespace UML
                 tab_num++;
             }
 
-            // インターフェース定義開始            
-            tab = StringBuilderSupporter.SetTab (tab_num);
+            // インターフェース定義開始
+            tab = StringBuilderHelper.SetTab (tab_num);
             builder.AppendLine (tab + GetDeclarationName ());
             builder.AppendLine (tab + "{");
             tab_num++;
             {
                 // メンバ宣言処理
                 if (!option.isNonCreateMember) {
-                    tab = StringBuilderSupporter.SetTab (tab_num);
+                    tab = StringBuilderHelper.SetTab (tab_num);
 
                     // 変数宣言
                     foreach (var name in GetDeclarationMethodNames ()) {
@@ -49,7 +49,7 @@ namespace UML
                         // usingリスト追加
                         foreach (var type_name in PlantUMLUtility.GetTypeNameFromDeclarationName (name)) {
                             var type = PlantUMLUtility.GetTypeFromTypeName (type_name);
-                            if(type == null || string.IsNullOrEmpty(type.Namespace)) {
+                            if (type == null || string.IsNullOrEmpty (type.Namespace)) {
                                 continue;
                             }
 
@@ -59,7 +59,7 @@ namespace UML
                 }
             }
             tab_num--;
-            tab = StringBuilderSupporter.SetTab (tab_num);
+            tab = StringBuilderHelper.SetTab (tab_num);
             builder.AppendLine (tab + "}");
 
             // ネームスペース終了チェック
@@ -67,13 +67,13 @@ namespace UML
                 builder.AppendLine ("}");
             }
 
-            if( option.declarationUsings != null ) {
-                foreach( var using_name in option.declarationUsings) {
+            if (option.declarationUsings != null) {
+                foreach (var using_name in option.declarationUsings) {
                     using_list.Add (using_name);
                 }
             }
 
-            StringBuilderSupporter.EditUsings (builder, using_list.ToArray ());
+            StringBuilderHelper.EditUsings (builder, using_list.ToArray ());
 
             return builder;
         }

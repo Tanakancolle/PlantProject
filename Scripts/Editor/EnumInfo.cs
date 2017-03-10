@@ -23,19 +23,19 @@ namespace UML
             }
 
             // 列挙型定義開始
-            tab = StringBuilderSupporter.SetTab (tab_num);
+            tab = StringBuilderHelper.SetTab (tab_num);
             builder.AppendLine (tab + GetDeclarationName ());
             builder.AppendLine (tab + "{");
             tab_num++;
             {
-                tab = StringBuilderSupporter.SetTab (tab_num);
+                tab = StringBuilderHelper.SetTab (tab_num);
 
                 foreach (var name in GetDeclarationMemberNames ()) {
                     builder.AppendLine (tab + name);
                 }
             }
             tab_num--;
-            tab = StringBuilderSupporter.SetTab (tab_num);
+            tab = StringBuilderHelper.SetTab (tab_num);
             builder.AppendLine (tab + "}");
 
             // ネームスペース終了チェック

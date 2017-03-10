@@ -40,7 +40,7 @@ PlantUMLConvertWindow --> PlantUMLConvertOption
 PlantUMLConverter -right-> PlantUMLConvertOption
 PlantUMLConverter -down-> IContentParser
 PlantUMLConverter --> ContentInfoBase
-PlantUMLConverter -left-> StringBuilderSupporter
+PlantUMLConverter -left-> StringBuilderHelper
 
 IContentParser -> ContentInfoBase
 

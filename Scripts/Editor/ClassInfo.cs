@@ -36,14 +36,14 @@ namespace UML
             }
 
             // クラス定義開始         
-            tab = StringBuilderSupporter.SetTab (tab_num);
+            tab = StringBuilderHelper.SetTab (tab_num);
             builder.AppendLine (tab + GetDeclarationName ());
             builder.AppendLine (tab + "{");
             tab_num++;
             {
                 // メンバ宣言処理
                 if (!option.isNonCreateMember) {
-                    tab = StringBuilderSupporter.SetTab (tab_num);
+                    tab = StringBuilderHelper.SetTab (tab_num);
 
                     // 変数宣言
                     foreach (var name in GetDeclarationValueNames ()) {
@@ -85,7 +85,7 @@ namespace UML
                 }
             }
             tab_num--;
-            tab = StringBuilderSupporter.SetTab (tab_num);
+            tab = StringBuilderHelper.SetTab (tab_num);
             builder.AppendLine (tab + "}");
 
             // ネームスペース終了チェック
@@ -100,7 +100,7 @@ namespace UML
                 }
             }
 
-            StringBuilderSupporter.EditUsings (builder, using_list.ToArray ());
+            StringBuilderHelper.EditUsings (builder, using_list.ToArray ());
 
             return builder;
         }
