@@ -172,7 +172,7 @@ namespace UML
                     continue;
                 }
 
-                yield return word;               
+                yield return word;
 
                 break;
             }
@@ -228,9 +228,10 @@ namespace UML
         /// <summary>
         /// タイプ名からタイプを取得
         /// </summary>
-        public static Type GetTypeFromTypeName(string type_name) {
+        public static Type GetTypeFromTypeName(string type_name)
+        {
             // 検索アセンブリ取得
-            if(assemblyList == null) {
+            if (assemblyList == null) {
                 assemblyList = new List<Assembly> ();
                 assemblyList.AddRange (AppDomain.CurrentDomain.GetAssemblies ().Where (x => !nonFindAssemblyName.Any (n => Regex.IsMatch (x.GetName ().Name, n))));
             }
@@ -242,8 +243,8 @@ namespace UML
             }
 
             // タイプ検索
-            foreach( var assembly in assemblyList){
-                foreach (var type in assembly.GetTypes()) {
+            foreach (var assembly in assemblyList) {
+                foreach (var type in assembly.GetTypes ()) {
                     if (type.Name.Equals (type_name)) {
                         return type;
                     }
@@ -252,6 +253,5 @@ namespace UML
 
             return null;
         }
-
     }
 }
