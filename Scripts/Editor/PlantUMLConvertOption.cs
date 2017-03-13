@@ -68,9 +68,11 @@ namespace UML
             option.isNonCreateNamespace = isNonCreateNamespace;
             option.isNonCreateMember = isNonCreateMember;
 
-            option.declarationUsings = new string[declarationUsings.Length];
-            for (int i = 0; i < declarationUsings.Length; ++i) {
-                option.declarationUsings[i] = declarationUsings[i];
+            if (declarationUsings != null || declarationUsings.Length != 0) {
+                option.declarationUsings = new string[declarationUsings.Length];
+                for (int i = 0; i < declarationUsings.Length; ++i) {
+                    option.declarationUsings [i] = declarationUsings [i];
+                }
             }
         }
     }
