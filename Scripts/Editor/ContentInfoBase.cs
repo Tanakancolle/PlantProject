@@ -77,13 +77,17 @@ namespace UML
         /// <summary>
         /// 抽象メンバー名取得
         /// </summary>
-        public virtual MemberInfo[] GetAbstractMemberInfos()
+        public virtual List<MemberInfo> GetAbstractMemberInfos()
         {
-            if (memberList == null) {
-                return null;
+            var list = new List<MemberInfo> ();
+
+            foreach (var info in inheritanceList) {
+                list.AddRange (info.GetAbstractMemberInfos ());
             }
 
-            return memberList.Where (member => member.isAbstract).ToArray ();
+            list.AddRange (memberList.Where (member => member.isAbstract));
+
+            return list;
         }
 
         /// <summary>

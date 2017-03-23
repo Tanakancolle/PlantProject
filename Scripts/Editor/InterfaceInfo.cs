@@ -83,7 +83,25 @@ namespace UML
         /// </summary>
         private string GetDeclarationName()
         {
-            return string.Format ("public interface {0}", contentName);
+            var declaration = string.Format ("public interface {0}", contentName);
+
+            // 継承チェック
+            if (inheritanceList != null && inheritanceList.Count > 0) {
+                StringBuilder builder = new StringBuilder ();
+
+                // 継承を再現
+                foreach (var inheritance in inheritanceList.Select (x => x.GetName ())) {
+                    if (builder.Length > 0) {
+                        builder.Append (", ");
+                    }
+
+                    builder.Append (inheritance);
+                }
+
+                declaration = string.Format ("{0} : {1}", declaration, builder.ToString ());
+            }
+
+            return declaration;
         }
 
         /// <summary>
@@ -91,10 +109,8 @@ namespace UML
         /// </summary>
         /// <returns>The declaration method names.</returns>
         private string[] GetDeclarationMethodNames()
-        {
-            var infos = GetDeclarationMemberInfos ();
-
-            var names = infos.Select (x => x.name.Replace ("public", string.Empty).TrimStart ());
+        {                
+            var names = memberList.Select (x => x.name.Replace ("public", string.Empty).TrimStart ());
 
             return names.Select (x => x + (x.IndexOf (";") < 0 ? ";" : string.Empty)).ToArray ();
         }
