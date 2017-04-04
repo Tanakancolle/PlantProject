@@ -12,11 +12,15 @@ class PlantUMLConverter {
 }
 
 interface IContentParser {
-   ContentInfoBase[] Parse(string[] lines, ref int index, string namespace_name = "")
+   IContentInfo[] Parse(string[] lines, ref int index, string namespace_name = "")
 }
 
-abstract class ContentInfoBase {
-  +abstract StringBuilder BuildScriptText(PlantUMLConvertOption option)
+interface IContentInfo {
+  StringBuilder BuildScriptText(PlantUMLConvertOption option)
+}
+
+abstract class ContainerInfoBase {
+
 }
 
 class PlantUMLConvertOption {
@@ -39,18 +43,18 @@ PlantUMLConvertWindow --> PlantUMLConvertOption
 
 PlantUMLConverter -right-> PlantUMLConvertOption
 PlantUMLConverter -down-> IContentParser
-PlantUMLConverter --> ContentInfoBase
-PlantUMLConverter -left-> StringBuilderHelper
+PlantUMLConverter --> IContentInfo
 
-IContentParser -> ContentInfoBase
+IContentParser -> IContentInfo
 
 IContentParser <|-down- ClassParser
 IContentParser <|-down- InterfaceParser
 IContentParser <|-down- EnumParser
 
-ContentInfoBase <|-down- ClassInfo
-ContentInfoBase <|-down- InterfaceInfo
-ContentInfoBase <|-down- EnumInfo
+IContentInfo <|-down- ContainerInfoBase
+ContainerInfoBase <|-down- ClassInfo
+ContainerInfoBase <|-down- InterfaceInfo
+IContentInfo <|-down- EnumInfo
 
 }
 
