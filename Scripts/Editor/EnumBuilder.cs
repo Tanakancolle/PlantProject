@@ -1,15 +1,55 @@
 ﻿using System.Linq;
 using System.Text;
+using System.Collections.Generic;
 
 namespace UML
 {
-
     /// <summary>
-    /// 列挙型情報
+    /// 列挙型ビルダー
     /// </summary>
-    public class EnumInfo : ContentInfoBase
+    public class EnumBuilder : IContentBuilder
     {
-        public override StringBuilder BuildScriptText(PlantUMLConvertOption option)
+        /// <summary>
+        /// 列挙型名
+        /// </summary>
+        private string enumName;
+
+        /// <summary>
+        /// ネームスペース名
+        /// </summary>
+        private string namespaceName;
+
+        /// <summary>
+        /// メンバ配列
+        /// </summary>
+        private List<string> memberList = new List<string>();
+
+        public void AddInheritance(IContentBuilder builder)
+        {
+            // 何もしない
+        }
+
+        public List<string> GetAbstractMember ()
+        {
+            return null;
+        }
+
+        public string GetName()
+        {
+            return enumName;
+        }
+
+        public void SetName(string name)
+        {
+            enumName = name;
+        }
+
+        public void SetNamespace(string name)
+        {
+            namespaceName = name;
+        }
+        
+        public StringBuilder BuildScriptText(PlantUMLConvertOption option)
         {
             var builder = new StringBuilder ();
             var tab = string.Empty;
@@ -24,7 +64,7 @@ namespace UML
 
             // 列挙型定義開始
             tab = StringBuilderHelper.SetTab (tab_num);
-            builder.AppendLine (tab + GetDeclarationName ());
+            builder.AppendLine (tab + string.Format ("public enum {0}", enumName));
             builder.AppendLine (tab + "{");
             tab_num++;
             {
@@ -46,12 +86,14 @@ namespace UML
             return builder;
         }
 
-        /// <summary>
-        /// 宣言する名前
-        /// </summary>
-        private string GetDeclarationName()
+        public void AddMember(string member)
         {
-            return string.Format ("public enum {0}", contentName);
+            memberList.Add (member);
+        }
+
+        public string[] GetAbstractMembers ()
+        {
+            return null;
         }
 
         /// <summary>
@@ -59,7 +101,7 @@ namespace UML
         /// </summary>
         private string[] GetDeclarationMemberNames()
         {
-            return memberList.Select (x => x.name.IndexOf (",") >= 0 ? x.name : x.name + ",").ToArray ();
+            return memberList.Select (member => member.IndexOf (",") >= 0 ? member : member + ",").ToArray ();
         }
     }
 }

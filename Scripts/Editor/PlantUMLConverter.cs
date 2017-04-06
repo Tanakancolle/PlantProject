@@ -11,7 +11,7 @@ namespace UML
     /// PlantUMLコンバーター
     /// </summary>
     public class PlantUMLConverter
-    {              
+    {
         public class LineInfo
         {
             public string line;
@@ -22,7 +22,7 @@ namespace UML
         /// <summary>
         /// コンテンツ情報リスト
         /// </summary>
-        private List<ContentInfoBase> contentInfoList = new List<ContentInfoBase> ();
+        private List<IContentBuilder> contentBuilderList = new List<IContentBuilder> ();
 
         /// <summary>
         /// パーサー配列
@@ -97,7 +97,7 @@ namespace UML
                 ParseArrow ();
                 ParseArrowExtensionLeft ();
                 ParseArrowExtensionRight ();
-            }                                                                                                                                                           
+            }
 
             // スクリプト生成処理
             CreateScripts (option, is_check);
@@ -106,7 +106,7 @@ namespace UML
         /// <summary>
         /// パース処理
         /// </summary>
-        /// <param name="lines">チェック文字配列</param>                             
+        /// <param name="lines">チェック文字配列</param>
         private void ParseProcess(string[] lines)
         {
             // ネームスペース関連
@@ -124,7 +124,7 @@ namespace UML
                 }
 
                 // コンテンツパース
-                if( ParseContents (lines, ref i, namespace_name) ) {
+                if (ParseContents (lines, ref i, namespace_name)) {
                     continue;
                 }
 
@@ -133,7 +133,7 @@ namespace UML
                     scope_count++;
                 }
 
-                // ネームスペース終了チェック          
+                // ネームスペース終了チェック
                 if (lines[i].IndexOf ("}") >= 0) {
                     if (scope_count > 0) {
                         scope_count--;
@@ -213,7 +213,7 @@ namespace UML
         /// </summary>
         private bool ParseContents(string[] lines, ref int index, string namespace_name)
         {
-            ContentInfoBase[] infos = null;
+            IContentBuilder[] infos = null;
 
             // パーサー毎にチェック
             foreach (var parser in parsers) {
@@ -221,10 +221,10 @@ namespace UML
 
                 // パースされたら終了
                 if (infos != null) {
-                    contentInfoList.AddRange (infos);
+                    contentBuilderList.AddRange (infos);
                     return true;
                 }
-            }                   
+            }
 
             return false;
         }
@@ -248,7 +248,7 @@ namespace UML
 
         /// <summary>
         /// 左継承矢印行かチェックしてリストに追加
-        /// </summary>                            
+        /// </summary>
         private void CheckArrowExtensionLeftLineAndAddList( string line, string namespace_name)
         {
             // 矢印チェック
@@ -287,27 +287,27 @@ namespace UML
         {   
             if( arrowLineInfoList == null) {
                 return;
-            }                
+            }
 
-            foreach(var line_info in arrowLineInfoList) {       
-                // クラス名取り出し                                                                                 
+            foreach(var line_info in arrowLineInfoList) {
+                // クラス名取り出し
                 var struct_names = arrowRegex.Split (line_info.line).Select (x => RemoveNotIncludedInContentName (x));
                 foreach (var struct_name in struct_names) {
                     // ネームスペースと分割 ※「.」のパターン
                     var splits = SplitNamespaceAndContentName (struct_name);
 
                     // すでに登録されているか
-                    if (contentInfoList.Any (x => x.GetName () == splits[1])) {
+                    if (contentBuilderList.Any (x => x.GetName () == splits[1])) {
                         continue;
                     }
 
                     // 新コンテンツはクラスとする
-                    var info = new ClassInfo ();
-                    info.SetNamespace (splits[0] == string.Empty ? line_info.namespaceName : splits[0]);
-                    info.SetName (splits[1]);
+                    var builder = new ClassBuilder ();
+                    builder.SetNamespace (splits[0] == string.Empty ? line_info.namespaceName : splits[0]);
+                    builder.SetName (splits[1]);
 
                     // クラス登録
-                    contentInfoList.Add (info);
+                    contentBuilderList.Add (builder);
                 }
 
             }
@@ -328,11 +328,11 @@ namespace UML
                 var base_splits = SplitNamespaceAndContentName (contents[0]);
                 var target_splits = SplitNamespaceAndContentName (contents[1]);
 
-                var base_content = contentInfoList.FirstOrDefault (x => x.GetName () == base_splits[1]);
-                var target_content = contentInfoList.FirstOrDefault (x => x.GetName () == target_splits[1]);
+                var base_content = contentBuilderList.FirstOrDefault (x => x.GetName () == base_splits[1]);
+                var target_content = contentBuilderList.FirstOrDefault (x => x.GetName () == target_splits[1]);
 
                 // 継承情報追加
-                target_content.AddInhritanceInfo (base_content);        
+                target_content.AddInheritance (base_content);
             }
         }    
 
@@ -351,14 +351,14 @@ namespace UML
                 var base_splits = SplitNamespaceAndContentName (contents[1]);
                 var target_splits = SplitNamespaceAndContentName (contents[0]);
 
-                var base_content = contentInfoList.FirstOrDefault (x => x.GetName () == base_splits[1]);
-                var target_content = contentInfoList.FirstOrDefault (x => x.GetName () == target_splits[1]);
+                var base_content = contentBuilderList.FirstOrDefault (x => x.GetName () == base_splits[1]);
+                var target_content = contentBuilderList.FirstOrDefault (x => x.GetName () == target_splits[1]);
 
                 // 継承情報追加
-                target_content.AddInhritanceInfo (base_content);
+                target_content.AddInheritance (base_content);
 
             }
-        }                                    
+        }
 
         /// <summary>
         /// コンテンツ名の不要文字削除
@@ -383,7 +383,7 @@ namespace UML
         {
             var create_path = option.createFolderPath.TrimEnd ('/');
 
-            foreach (var info in contentInfoList) {
+            foreach (var info in contentBuilderList) {
                 // スクリプトテキスト取得
                 var builder = info.BuildScriptText (option);
 

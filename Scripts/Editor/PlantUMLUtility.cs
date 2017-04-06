@@ -53,6 +53,25 @@ namespace UML
         };
 
         /// <summary>
+        /// タイプ名変換テーブル
+        /// </summary>
+        private static readonly KeyValuePair<string,string>[] changeTypeNameTable = new KeyValuePair<string, string>[] {
+            new KeyValuePair<string, string> ("bool", "Boolean"),
+            new KeyValuePair<string, string> ("byte", "Byte"),
+            new KeyValuePair<string, string> ("char", "Char"),
+            new KeyValuePair<string, string> ("decimal", "Decimal"),
+            new KeyValuePair<string, string> ("double", "Double"),
+            new KeyValuePair<string, string> ("float", "Single"),
+            new KeyValuePair<string, string> ("int", "Int32"),
+            new KeyValuePair<string, string> ("long", "Int64"),
+            new KeyValuePair<string, string> ("sbyte", "SByte"),
+            new KeyValuePair<string, string> ("short", "Int16"),
+            new KeyValuePair<string, string> ("uint", "UInt32"),
+            new KeyValuePair<string, string> ("ulong", "UInt64"),
+            new KeyValuePair<string, string> ("ushort", "UInt16"),
+        };
+
+        /// <summary>
         /// アセンブリリスト
         /// </summary>
         private static List<Assembly> assemblyList;
@@ -158,11 +177,11 @@ namespace UML
         }
 
         /// <summary>
-        /// 宣言名からタイプ名取得
+        /// 宣言名から帰り値タイプ名取得
         /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public static IEnumerable<string> GetTypeNameFromDeclarationName(string name)
+        /// <returns>The return type name from declaration name.</returns>
+        /// <param name="name">Name.</param>
+        public static string GetReturnTypeNameFromDeclarationName(string name)
         {
             var words = PlantUMLUtility.SplitSpace (name);
 
@@ -172,13 +191,23 @@ namespace UML
                     continue;
                 }
 
-                yield return word;
-
-                break;
+                return word;
             }
 
+            return null;
+        }
+
+        /// <summary>
+        /// 宣言名からタイプ名取得
+        /// </summary>
+        /// <returns>The return type name from declaration name.</returns>
+        /// <param name="name">Name.</param>
+        public static IEnumerable<string> GetTypeNamesFromDeclarationName(string name)
+        {
+            yield return GetReturnTypeNameFromDeclarationName (name);
+
             // 関数の引数
-            foreach (var type_name in GetTypeNameInRange ('(', ')', name)) {
+            foreach (var type_name in GetTypeNameInRange ('(', ')', name, true)) {
                 yield return type_name;
             }
 
@@ -191,7 +220,7 @@ namespace UML
         /// <summary>
         /// 範囲内のタイプ名取得
         /// </summary>                         
-        private static IEnumerable<string> GetTypeNameInRange(char start, char end, string text)
+        private static IEnumerable<string> GetTypeNameInRange(char start, char end, string text, bool is_first = false)
         {
             int index = 0;
             while (true) {
@@ -222,6 +251,10 @@ namespace UML
                         break;
                     }
                 }
+
+                if (is_first) {
+                    yield break;
+                }
             }
         }
 
@@ -234,6 +267,14 @@ namespace UML
             if (assemblyList == null) {
                 assemblyList = new List<Assembly> ();
                 assemblyList.AddRange (AppDomain.CurrentDomain.GetAssemblies ().Where (x => !nonFindAssemblyName.Any (n => Regex.IsMatch (x.GetName ().Name, n))));
+            }
+
+            // 型名変換
+            foreach (var kv in changeTypeNameTable) {
+                if (kv.Key == type_name) {
+                    type_name = kv.Value;
+                    break;
+                }
             }
 
             // ジェネリック対応処理

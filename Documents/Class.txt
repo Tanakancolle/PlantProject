@@ -12,14 +12,17 @@ class PlantUMLConverter {
 }
 
 interface IContentParser {
-   IContentInfo[] Parse(string[] lines, ref int index, string namespace_name = "")
+   IContentBuilder[] Parse(string[] lines, ref int index, string namespace_name = "")
 }
 
-interface IContentInfo {
+interface IContentBuilder {
+  void AddInheritance(IContentBuilder builder);
+  string[] GetAbstractMembers();
+  string GetName();
   StringBuilder BuildScriptText(PlantUMLConvertOption option)
 }
 
-abstract class ContainerInfoBase {
+abstract class ContainerBuilderBase {
 
 }
 
@@ -27,7 +30,7 @@ class PlantUMLConvertOption {
   +string createFolderPath
   +string arrowPattern
   +string arrowExtensionLeftPattern
-  +string arrowExtensionRightPattern
+  +string arrowExtensionRightPattern∂
   +bool isNonCreateMember
   +string[] declarationUsings
 
@@ -43,18 +46,18 @@ PlantUMLConvertWindow --> PlantUMLConvertOption
 
 PlantUMLConverter -right-> PlantUMLConvertOption
 PlantUMLConverter -down-> IContentParser
-PlantUMLConverter --> IContentInfo
+PlantUMLConverter --> IContentBuilder
 
-IContentParser -> IContentInfo
+IContentParser -> IContentBuilder
 
 IContentParser <|-down- ClassParser
 IContentParser <|-down- InterfaceParser
 IContentParser <|-down- EnumParser
 
-IContentInfo <|-down- ContainerInfoBase
-ContainerInfoBase <|-down- ClassInfo
-ContainerInfoBase <|-down- InterfaceInfo
-IContentInfo <|-down- EnumInfo
+IContentBuilder <|-down- ContainerBuilderBase
+ContainerBuilderBase <|-down- ClassBuilder
+ContainerBuilderBase <|-down- InterfaceBuilder
+IContentBuilder <|-down- EnumBuilder
 
 }
 

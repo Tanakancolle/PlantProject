@@ -1,37 +1,36 @@
 ﻿
 namespace UML
 {
-
     /// <summary>
     /// クラスパーサー
     /// </summary>
     public class ClassParser : IContentParser
     {
-        public ContentInfoBase[] Parse(string[] lines, ref int index, string namespace_name = "")
+        public IContentBuilder[] Parse(string[] lines, ref int index, string namespace_name = "")
         {
             var words = PlantUMLUtility.SplitSpace (lines[index]);
 
             // コンテンツ名インデックス取得
-            int name_index = PlantUMLUtility.GetContentNameIndexFromWords (words, "class");     
+            int name_index = PlantUMLUtility.GetContentNameIndexFromWords (words, "class");
             if( name_index == -1) {
                 return null;
             }
 
-            var info = new ClassInfo ();
+            var builder = new ClassBuilder ();
 
             // コンテンツ名設定
-            info.SetName (words[name_index].Replace ("{", string.Empty));
+            builder.SetName (words[name_index].Replace ("{", string.Empty));
 
             // ネームスペース設定
-            info.SetNamespace (namespace_name);
+            builder.SetNamespace (namespace_name);
 
             // 抽象クラスフラグ設定
-            info.isAbstract = PlantUMLUtility.CheckContainsWords (words, "abstract");
+            builder.isAbstract = PlantUMLUtility.CheckContainsWords (words, "abstract");
 
             // 内容チェック
             if (lines[index].IndexOf ("{") < 0) {
-                return new ContentInfoBase[] { info };
-            }                                         
+                return new IContentBuilder[] { builder };
+            }
 
             index++;
 
@@ -43,13 +42,13 @@ namespace UML
                 member.isAbstract = PlantUMLUtility.CheckContainsWords (PlantUMLUtility.SplitSpace (lines[index]), "abstract");
 
                 if (!string.IsNullOrEmpty (member.name)) {
-                    info.AddMemberInfo (member);
+                    builder.AddMemberInfo (member);
                 }
 
                 index++;
             }
 
-            return new ContentInfoBase[] { info };
+            return new IContentBuilder[] { builder };
         }
     }
 }

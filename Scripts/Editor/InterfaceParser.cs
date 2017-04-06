@@ -7,7 +7,7 @@ namespace UML
     /// </summary>
     public class InterfaceParser : IContentParser
     {
-        public ContentInfoBase[] Parse(string[] lines, ref int index, string namespace_name = "")
+        public IContentBuilder[] Parse(string[] lines, ref int index, string namespace_name = "")
         {
             var words = PlantUMLUtility.SplitSpace (lines[index]);
 
@@ -17,17 +17,17 @@ namespace UML
                 return null;
             }
             
-            var info = new InterfaceInfo ();
+            var builder = new InterfaceBuilder ();
 
             // コンテンツ名設定
-            info.SetName (words[name_index].Replace ("{", string.Empty));
+            builder.SetName (words[name_index].Replace ("{", string.Empty));
 
             // ネームスペース設定
-            info.SetNamespace (namespace_name);                                                                   
+            builder.SetNamespace (namespace_name);                                                                   
 
             // 内容チェック
             if (lines[index].IndexOf ("{") < 0) {
-                return new ContentInfoBase[] { info };
+                return new IContentBuilder[] { builder };
             }
                                                      
             index++;
@@ -44,12 +44,12 @@ namespace UML
                 member.name = string.Format ("public {0}", lines[index].TrimStart ());
                 member.isAbstract = true;
 
-                info.AddMemberInfo (member);    
+                builder.AddMemberInfo (member);    
 
                 index++;
             }
 
-            return new ContentInfoBase[] { info };
+            return new IContentBuilder[] { builder };
         }
     }
 }
