@@ -231,7 +231,7 @@ namespace UML
 
         /// <summary>
         /// 矢印行かチェックしてリストに追加
-        /// </summary>                              
+        /// </summary>
         private void CheckArrowLineAndAddList( string line, string namespace_name)
         {
             // 矢印チェック
@@ -265,7 +265,7 @@ namespace UML
 
         /// <summary>
         /// 右継承矢印行かチェックしてリストに追加
-        /// </summary>                            
+        /// </summary>
         private void CheckArrowExtensionRightLineAndAddList(string line, string namespace_name)
         {
             // 矢印チェック

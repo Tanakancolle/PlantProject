@@ -1,4 +1,6 @@
-﻿
+﻿using System.Text.RegularExpressions;
+
+
 namespace UML
 {
     /// <summary>
@@ -35,11 +37,12 @@ namespace UML
             index++;
 
             // 定義終了まで内容をパース
+            var abstract_regex = new Regex(@"_*abstract _*");
             while (lines[index].IndexOf ("}") < 0) {
                 var member = new MemberInfo ();
 
                 member.name = PlantUMLUtility.ReplaceAccessModifiers (lines[index]).TrimStart ();
-                member.isAbstract = PlantUMLUtility.CheckContainsWords (PlantUMLUtility.SplitSpace (lines[index]), "abstract");
+                member.isAbstract = abstract_regex.IsMatch (lines [index]);
 
                 if (!string.IsNullOrEmpty (member.name)) {
                     builder.AddMemberInfo (member);

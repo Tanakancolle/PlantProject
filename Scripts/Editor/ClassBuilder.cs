@@ -92,7 +92,12 @@ namespace UML
             }));
 
             // 返り値記述
+            var abstract_regex = new Regex("_*abstract _*");
             for (int i = 0; i < list.Count; ++i) {
+                if (abstract_regex.IsMatch (list [i])) {
+                    continue;
+                }
+
                 var type_name = PlantUMLUtility.GetReturnTypeNameFromDeclarationName (list [i]);
 
                 if (string.IsNullOrEmpty (type_name) || type_name == "void") {
