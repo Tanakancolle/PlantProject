@@ -16,7 +16,7 @@ namespace UML
         /// <summary>
         /// 矢印パターン
         /// </summary>
-        public string arrowPattern = @"(?:<\|-{0,}{dir}-{1,}|-{1,}{dir}-{0,}\|>|<-{dir}-{1,}|-{1,}{dir}->)";
+        public string arrowPattern = @"(?:<\|-{0,}{dir}-{1,}|-{1,}{dir}-{0,}\|>|<-{0,}{dir}-{1,}|-{1,}{dir}-{0,}>)";
 
         /// <summary>
         /// 拡張左矢印パターン
